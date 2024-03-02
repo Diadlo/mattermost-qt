@@ -41,7 +41,7 @@ if(BUILD_MULTIMEDIA)
 	find_package(Qt6 COMPONENTS MultimediaWidgets REQUIRED)
 endif()
 
-include_directories(${Qt5Network_INCLUDE_DIRS} sources/)
+include_directories(${Qt5Network_INCLUDE_DIRS} sources/ sources/chat-area/)
 
 if(ANDROID)
   add_library(mattermost-client SHARED
