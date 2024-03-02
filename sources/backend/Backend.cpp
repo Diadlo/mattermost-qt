@@ -628,7 +628,18 @@ void Backend::retrieveOwnChannelMembershipsForTeam (BackendTeam& team, std::func
 
     	LOG_DEBUG ("Team " << team.display_name << ":");
 		for (const auto &itemRef: doc.array()) {
-			storage.addChannel (team, itemRef.toObject());
+			uint32_t channelType = BackendChannel::getChannelType (itemRef.toObject());
+			if (channelType != BackendChannel::directChannel) {
+				continue;
+			}
+
+			QString name = itemRef.toObject().value("name").toString();
+			QJsonDocument doc(itemRef.toObject());
+			QString strJson(doc.toJson(QJsonDocument::Compact));
+			if (name == "hm194xqdxjgt8kard5k544rfdw__hm194xqdxjgt8kard5k544rfdw")
+			{
+				storage.addChannel (team, itemRef.toObject());
+			}
 		}
 
 		for (auto& channel: team.channels) {
@@ -1310,4 +1321,3 @@ ServerDialogsMap& Backend::getServerDialogsMap ()
 }
 
 } /* namespace Mattermost */
-
