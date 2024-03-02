@@ -188,7 +188,7 @@
           </widget>
          </item>
          <item alignment="Qt::AlignBottom">
-          <widget class="QLabel" name="headerLabel">
+          <widget class="ElidedLabel" name="headerLabel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
              <horstretch>0</horstretch>

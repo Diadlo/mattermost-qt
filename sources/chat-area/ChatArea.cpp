@@ -22,6 +22,7 @@
 #include <QDockWidget>
 #include "channel-tree/ChannelItem.h"
 #include "ui_ChatArea.h"
+#include "elidedlabel.h"
 #include "post/PostWidget.h"
 #include "backend/Backend.h"
 #include "channel-tree/ChannelItemWidget.h"
