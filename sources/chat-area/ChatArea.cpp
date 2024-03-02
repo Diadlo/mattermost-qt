@@ -61,6 +61,23 @@ ChatArea::ChatArea (Backend& backend, BackendChannel& channel, ChannelItem* tree
 
 	ui->titleLabel->setText (channel.display_name);
 	ui->headerLabel->setText (channel.getChannelDescription ());
+
+	// The limitation of this approach is that ElidedLabel calculates the length
+	// of the text not considering markdown. It may lead to a situation where
+	// the text is elided, but the markdown is broken.
+	// Example:
+	//    Input:
+	// 		    Text [link](https://some.long.domain.com) some more text
+	//    No issue with wide window:
+	//      | Text link some more text                                 |
+	//   Issues with narrow window:
+	//      | Text link some more...                              |
+	//      | Text [link](https://some.lon...|
+	//      | Text [lin...|
+	//    Expected output with narrow window (link is cliable and not broken):
+	//      | Text link some more text                            |
+	//      | Text link some more text       |
+	//      | Text lin...|
 	ui->headerLabel->setTextFormat(Qt::MarkdownText);
   ui->headerLabel->setTextInteractionFlags(
     Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse|Qt::TextBrowserInteraction
