@@ -61,6 +61,12 @@ ChatArea::ChatArea (Backend& backend, BackendChannel& channel, ChannelItem* tree
 
 	ui->titleLabel->setText (channel.display_name);
 	ui->headerLabel->setText (channel.getChannelDescription ());
+	ui->headerLabel->setTextFormat(Qt::MarkdownText);
+  ui->headerLabel->setTextInteractionFlags(
+    Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse|Qt::TextBrowserInteraction
+  );
+  ui->headerLabel->setOpenExternalLinks(true);
+
 
 	setTextEditWidgetHeight (texteditDefaultHeight);
 
