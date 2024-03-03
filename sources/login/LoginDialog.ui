@@ -222,6 +222,13 @@ Password and token can't be used simultenusly</string>
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="browserLogin_pushButton">
+       <property name="text">
+        <string>Login with browser</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
