@@ -1023,6 +1023,7 @@ void Backend::deletePost (const QString postID)
 
 void Backend::pinPost (const QString postID)
 {
+#ifndef _WIN32
 #warning Implement post pinning
 #endif
     (void)postID;
