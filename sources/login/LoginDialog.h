@@ -37,7 +37,9 @@ public:
 	~LoginDialog ();
 private slots:
 	void on_login_pushButton_clicked();
+	void on_browserLogin_pushButton_clicked();
 
+	void processTokenAuth(const QString& token);
 	void onNetworkError (uint32_t errorNumber, const QString& errorText);
 	void onHttpError (uint32_t errorNumber, const QString& errorText);
 

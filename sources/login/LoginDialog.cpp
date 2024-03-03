@@ -17,10 +17,15 @@
  * along with Mattermost-QT. if not, see https://www.gnu.org/licenses/.
  */
 
+#include <QtGui/qcolor.h>
 #include <iostream>
 #include "LoginDialog.h"
 #include "ui_LoginDialog.h"
 
+#include <QWebEngineView>
+#include <QWebEngineCookieStore>
+#include <QWebEngineProfile>
+#include <QNetworkCookie>
 #include <QSettings>
 #include "backend/Backend.h"
 #include "log.h"
@@ -88,6 +93,41 @@ void LoginDialog::on_login_pushButton_clicked()
 	loginToServer (loginData);
 }
 
+void LoginDialog::on_browserLogin_pushButton_clicked()
+{
+  if (ui->domain_lineEdit->text().isEmpty())
+  {
+    setError("Please enter the domain.");
+    return;
+  }
+
+  QWebEngineView *view = new QWebEngineView();
+  QString domain = ui->domain_lineEdit->text();
+  view->load(QUrl(domain));
+  view->resize(1024, 750);
+  view->show();
+
+  QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
+  QObject::connect(profile->cookieStore(), &QWebEngineCookieStore::cookieAdded,
+    [=](const QNetworkCookie &cookie) {
+      if (cookie.name() == "MMAUTHTOKEN") {
+        QString token = cookie.value();
+        view->close();
+        processTokenAuth(token);
+      }
+    }
+  );
+}
+
+void LoginDialog::processTokenAuth(const QString& token)
+{
+  QSettings settings;
+  BackendLoginData loginData;
+  loginData.domain = ui->domain_lineEdit->text();
+  loginData.token = token;
+  loginData.saveToSettings (settings);
+  loginToServer (loginData);
+}
 
 void LoginDialog::loginToServer (const BackendLoginData& loginData)
 {
@@ -147,4 +187,3 @@ void LoginDialog::setError (const QString& errorStr)
 }
 
 } /* namespace Mattermost */
-

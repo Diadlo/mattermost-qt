@@ -24,6 +24,8 @@
 
 #include "OutgoingPostCreator.h"
 
+#include <QWebEngineView>
+#include <QWebEngineCookieStore>
 #include <QDragMoveEvent>
 #include <QMimeData>
 #include <QMessageBox>
