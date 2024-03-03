@@ -53,6 +53,7 @@ public:
 	bool isChannelActive (const BackendChannel& channel);
 
 	void addTeam (Backend& backend, BackendTeam& team);
+	void addFavoritesChannelsList(Backend& backend);
 	void addDirectChannelsList (Backend& backend);
 	void addGroupChannelsList (Backend& backend);
 

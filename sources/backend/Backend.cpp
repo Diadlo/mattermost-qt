@@ -352,8 +352,7 @@ void Backend::retrieveUserPreferences ()
 
         LOG_DEBUG ("retrieveUserPreferences reply");
 
-        QString jsonString = doc.toJson(QJsonDocument::Indented);
-        //LOG_DEBUG ("retrieveUserPreferences reply: " << jsonString);
+        storage.setUserPreferences(doc);
     }));
 }
 
