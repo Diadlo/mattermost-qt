@@ -343,7 +343,10 @@ void WebSocketEventHandler::handleEvent (const ChannelUpdatedEvent& event)
 
 	LOG_DEBUG ("Channel updated: " << channel->display_name);
 
-	channel->display_name = event.displayName;
+	// Server may respond with empty displayName if it isn't changed
+	if (!event.displayName.isEmpty()) {
+		channel->display_name = event.displayName;
+	}
 	channel->name = event.name;
 	channel->header = event.header;
 	channel->purpose = event.purpose;
