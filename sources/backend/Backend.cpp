@@ -537,7 +537,7 @@ void Backend::retrieveOwnTeams (std::function<void(BackendTeam&)> callback)
 #endif
 
 		auto root = doc.array();
-		for (const auto &itemRef: qAsConst(root)) {
+		for (const auto &itemRef: std::as_const(root)) {
 			storage.addTeam (itemRef.toObject());
 			++nonFilledTeams;
 		}
@@ -679,7 +679,7 @@ void Backend::retrieveTeamMembers (BackendTeam& team, int page)
 		std::cout << "retrieveTeamMembers reply: " <<  jsonString.toStdString() << std::endl;
 #endif
 		auto root = doc.array();
-		for (const auto &itemRef: qAsConst(root)) {
+		for (const auto &itemRef: std::as_const(root)) {
 			team.addMember (storage, itemRef.toObject());
 		}
 
@@ -858,7 +858,7 @@ void Backend::retrieveChannelMembers (BackendChannel& channel, std::function<voi
 		std::cout << "retrieveChannelMembers reply: " <<  jsonString.toStdString() << std::endl;
 #endif
 		auto root = doc.array();
-		for (const auto &itemRef: qAsConst(root)) {
+		for (const auto &itemRef: std::as_const(root)) {
 			channel.addMember (storage, itemRef.toObject());
 		}
 		callback ();
