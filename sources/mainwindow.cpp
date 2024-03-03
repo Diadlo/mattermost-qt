@@ -24,7 +24,18 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
-#include "./ui_mainwindow.h"
+#include <QApplication>
+#include <QFrame>
+#include <QMenu>
+#include <QHeaderView>
+#include <QMenuBar>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QStackedWidget>
+#include <QToolButton>
+#include "channel-tree/ChannelTree.h"
 #include "chat-area/ChatArea.h"
 #include "backend/Backend.h"
 #include "Settings.h"
@@ -36,7 +47,6 @@ namespace Mattermost {
 
 MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _backend)
 :QMainWindow(parent)
-,ui (std::make_unique<Ui::MainWindow>())
 ,trayIcon (trayIcon)
 ,chooseEmojiDialog(Settings::getInstance(), this)
 ,backend (_backend)
@@ -45,30 +55,30 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 {
 	LOG_DEBUG ("MainWindow create start");
 
-	ui->setupUi(this);
-	ui->channelList->setChatAreaStackedWidget (ui->chatAreaStackedWidget);
-	ui->channelList->setFocus();
+	setupUi();
+	m_channelList->setChatAreaStackedWidget (m_chatAreaStackedWidget);
+	m_channelList->setFocus();
 
 	createMenu ();
 
 	const BackendUser& currentUser = backend.getLoginUser();
 
 	if (currentUser.id.isEmpty()) {
-		ui->usericon_label->clear();
+		m_usericon_label->clear();
 		qCritical() << "Current User's ID is empty string";
 		return;
 	}
 
 	connect (&currentUser, &BackendUser::onStatusChanged, [this, &currentUser] {
-		ui->statusLabel->setText (currentUser.status);
+		m_statusLabel->setText (currentUser.status);
 	});
 
-	ui->usernameLabel->setText (currentUser.username);
+	m_usernameLabel->setText (currentUser.username);
 
 	connect (&currentUser, &BackendUser::onAvatarChanged, [this, &currentUser] {
 		LOG_DEBUG ("Got User Image");
 		QImage img = QImage::fromData (currentUser.avatar).scaled(42, 42, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		ui->usericon_label->setPixmap (QPixmap::fromImage(img));
+		m_usericon_label->setPixmap (QPixmap::fromImage(img));
 	});
 
 	/*
@@ -83,7 +93,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	/*
 	 * Register for signals
 	 */
-	//connect (ui->channelList, &QTreeWidget::currentItemChanged, this, &MainWindow::channelListWidget_itemClicked);
+	//connect (m_channelList, &QTreeWidget::currentItemChanged, this, &MainWindow::channelListWidget_itemClicked);
 
 	//getAllUsers is called from onShowEvent()
 	connect (&backend, &Backend::onAllUsers, [this]() {
@@ -92,7 +102,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 		 * The callback is called once for each team
 		 */
 		backend.retrieveOwnTeams ([this](BackendTeam& team) {
-			ui->channelList->addTeam (backend, team);
+			m_channelList->addTeam (backend, team);
 		});
 	});
 
@@ -106,9 +116,9 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	 * which need to be displayer ad user names
 	 */
 	connect (&backend, &Backend::onAllTeamChannelsPopulated, [this] {
-		ui->channelList->addFavoritesChannelsList(backend);
-		ui->channelList->addGroupChannelsList (backend);
-		ui->channelList->addDirectChannelsList (backend);
+		m_channelList->addFavoritesChannelsList(backend);
+		m_channelList->addGroupChannelsList (backend);
+		m_channelList->addDirectChannelsList (backend);
 
 //		QSettings settings;
 //		QString currentTeam (settings.value ("current_team", 0).toString());
@@ -116,7 +126,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 		//Activate the same team that was active during the last session
 //				if (teamChannelTree->team.id == currentTeam) {
 //					LOG_DEBUG ("MainWindow activate team " << currentTeam);
-//					//ui->teamComboBox->setCurrentIndex (teamSeq);
+//					//m_teamComboBox->setCurrentIndex (teamSeq);
 //					//channelList.activateTeam (teamSeq);
 //					currentTeamRestoredFromSettings = true;
 //				}
@@ -138,7 +148,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	 * onAddedToTeam comes after a WebSocket event, when the user is added to (new) team
 	 */
 	connect (&backend, &Backend::onAddedToTeam, [this](BackendTeam& team) {
-		ui->channelList->addTeam (backend, team);
+		m_channelList->addTeam (backend, team);
 	});
 
 	/*
@@ -155,6 +165,122 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	LOG_DEBUG ("MainWindow create finish");
 }
 
+void MainWindow::setupUi()
+{
+	resize(800, 600);
+	setWindowIcon(QIcon(":/icons/img/icon0.ico"));
+
+	m_actionAbout = new QAction(this);
+	m_centralwidget = new QWidget(this);
+	m_gridLayout_2 = new QGridLayout(m_centralwidget);
+	m_gridLayout_2->setSpacing(0);
+
+	m_lefttop_frame = new QFrame(m_centralwidget);
+	m_lefttop_frame->setMinimumSize(QSize(223, 50));
+	m_lefttop_frame->setMaximumSize(QSize(16777215, 50));
+	m_lefttop_frame->setBaseSize(QSize(223, 63));
+	m_lefttop_frame->setFrameShape(QFrame::NoFrame);
+	m_lefttop_frame->setFrameShadow(QFrame::Raised);
+	m_lefttop_frame->setLineWidth(0);
+
+	m_horizontalLayout = new QHBoxLayout(m_lefttop_frame);
+	m_horizontalLayout->setSpacing(2);
+	m_horizontalLayout->setContentsMargins(2, 0, 0, 0);
+
+	m_usericon_label = new QLabel(m_lefttop_frame);
+	QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(m_usericon_label->sizePolicy().hasHeightForWidth());
+	m_usericon_label->setSizePolicy(sizePolicy);
+	m_usericon_label->setMinimumSize(QSize(42, 42));
+	m_usericon_label->setMaximumSize(QSize(42, 42));
+	m_usericon_label->setFrameShape(QFrame::Box);
+
+	m_horizontalLayout->addWidget(m_usericon_label);
+
+	m_verticalLayout = new QVBoxLayout();
+	m_usernameLabel = new QLabel(m_lefttop_frame);
+	m_usernameLabel->setMinimumSize(QSize(200, 20));
+
+	m_verticalLayout->addWidget(m_usernameLabel);
+
+	m_statusLabel = new QLabel(m_lefttop_frame);
+	m_statusLabel->setObjectName("statusLabel");
+
+	m_verticalLayout->addWidget(m_statusLabel);
+
+	m_horizontalLayout->addLayout(m_verticalLayout);
+
+	m_toolButton = new QToolButton(m_lefttop_frame);
+	m_toolButton->setObjectName("toolButton");
+	m_toolButton->setIcon(QIcon(":/icons/burger"));
+	m_toolButton->setPopupMode(QToolButton::InstantPopup);
+
+	m_horizontalLayout->addWidget(m_toolButton);
+
+	m_gridLayout_2->addWidget(m_lefttop_frame, 0, 0, 1, 1);
+
+	m_channelList = new Mattermost::ChannelTree(m_centralwidget);
+	QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+	treeItem->setText(1, QString::fromUtf8("2"));
+	treeItem->setText(0, QString::fromUtf8("1"));
+	m_channelList->setHeaderItem(treeItem);
+
+	QSizePolicy sizePolicy1(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+	sizePolicy1.setHorizontalStretch(0);
+	sizePolicy1.setVerticalStretch(0);
+	sizePolicy1.setHeightForWidth(m_channelList->sizePolicy().hasHeightForWidth());
+	m_channelList->setSizePolicy(sizePolicy1);
+	m_channelList->setMaximumSize(QSize(500, 16777215));
+	m_channelList->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_channelList->setStyleSheet(QString::fromUtf8(
+"QTreeWidget::branch:!has-children {\n"
+"	border: none;\n"
+"}\n"
+"\n"
+"QTreeWidget::branch:open:has-children {\n"
+"	image: url(:/img/arrow_expanded.png)\n"
+"}\n"
+"\n"
+"QTreeWidget::branch:closed:has-children {\n"
+"	image: url(:/img/arrow_collapsed.png)\n"
+"}\n"
+""));
+	m_channelList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_channelList->setIconSize(QSize(20, 20));
+	m_channelList->setIndentation(12);
+	m_channelList->setColumnCount(2);
+	m_channelList->header()->setVisible(false);
+	m_channelList->header()->setMinimumSectionSize(0);
+	m_channelList->header()->setDefaultSectionSize(30);
+	m_channelList->header()->setStretchLastSection(false);
+
+	m_gridLayout_2->addWidget(m_channelList, 1, 0, 1, 1);
+
+	m_chatAreaStackedWidget = new QStackedWidget(m_centralwidget);
+
+	m_gridLayout_2->addWidget(m_chatAreaStackedWidget, 0, 1, 2, 1);
+
+	setCentralWidget(m_centralwidget);
+	m_menubar = new QMenuBar(this);
+	m_menubar->setGeometry(QRect(0, 0, 800, 32));
+	setMenuBar(m_menubar);
+	QWidget::setTabOrder(m_channelList, m_toolButton);
+
+	retranslateUi();
+
+	QMetaObject::connectSlotsByName(this);
+}
+
+void MainWindow::retranslateUi()
+{
+	this->setWindowTitle(tr("Mattermost", "Main window title"));
+	m_actionAbout->setText(tr("About", "Action in menu"));
+	m_statusLabel->clear();
+	m_toolButton->setText("...");
+}
+
 MainWindow::~MainWindow()
 {
 }
@@ -163,7 +289,7 @@ static QString infoText (QString ("Version " PROJECT_VER "<br/>"
 "An unofficial Mattermost Client, using the QT framework<br/>") +
 R"(
 <br/>
-More information:<br/> 
+More information:<br/>
 <a href='https://github.com/nuclear868/mattermost-qt'>https://github.com/nuclear868/mattermost-qt</a>
 <br/>
 <br/>
@@ -180,7 +306,7 @@ along with Mattermost-QT. if not, see <a href='https://www.gnu.org/licenses/'>ht
 
 void MainWindow::createMenu ()
 {
-	mainMenu = new QMenu (ui->toolButton);
+	mainMenu = new QMenu (m_toolButton);
 
 	QMenu* fileMenu = mainMenu->addMenu ("File");
 	fileMenu->addAction ("Logout", [this] {
@@ -226,13 +352,13 @@ void MainWindow::createMenu ()
 		QMessageBox::aboutQt (this, "About QT");
 	});
 
-	ui->toolButton->setMenu(mainMenu);
+	m_toolButton->setMenu(mainMenu);
 }
 
 void MainWindow::moveEvent (QMoveEvent*)
 {
 
-	ChatArea* currentPage = ui->channelList->getCurrentPage();
+	ChatArea* currentPage = m_channelList->getCurrentPage();
 
 	if (currentPage) {
 		currentPage->onMove (pos());
@@ -261,7 +387,7 @@ void MainWindow::changeEvent (QEvent* event)
 		if (isActiveWindow()) {
 			//qDebug() << "Activated";
 
-			ChatArea* currentPage = ui->channelList->getCurrentPage();
+			ChatArea* currentPage = m_channelList->getCurrentPage();
 
 			if (currentPage) {
 				currentPage->onMainWindowActivate ();
@@ -304,7 +430,7 @@ void MainWindow::initializationComplete ()
 	 * was deleted. In all cases, activate the first team
 	 */
 	if (!currentTeamRestoredFromSettings) {
-	//	ui->teamComboBox->setCurrentIndex (0);
+	//	m_teamComboBox->setCurrentIndex (0);
 		//channelList.activateTeam (0);
 	}
 }
@@ -320,7 +446,7 @@ void MainWindow::messageNotify (const BackendChannel& channel, const BackendPost
 	 * If the Mattermost window is active (has focus) and the current channel is active,
 	 * do not add notifications. We assume that the user is watching the chat window
 	 */
-	if (isActiveWindow() && ui->channelList->isChannelActive (channel)) {
+	if (isActiveWindow() && m_channelList->isChannelActive (channel)) {
 		return;
 	}
 
