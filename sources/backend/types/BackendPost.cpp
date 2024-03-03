@@ -101,8 +101,9 @@ bool BackendPost::isOwnPollPost () const
 	if (!poll) {
 		return false;
 	}
-
+#ifndef _WIN32
 #warning "fix"
+#endif
 	return true;
 	//BackendUser* user =
 	//return poll->authorName

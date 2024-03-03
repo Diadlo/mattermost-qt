@@ -13,7 +13,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -ggdb")
+if (MSVC)
+	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /Wall /W4")
+else()
+	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -ggdb")
+endif()
 
 set(APPID "mattermost-qt")
 
