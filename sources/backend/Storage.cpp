@@ -34,7 +34,11 @@ Storage::Storage ()
 {
 }
 
-Storage::~Storage () = default;
+Storage::~Storage()
+{
+	delete loginUser;
+	delete matterpollUser;
+}
 
 void Storage::reset ()
 {
@@ -57,6 +61,11 @@ const BackendUser* Storage::getUserById (const QString& userID) const
 	}
 
 	return &it->second;
+}
+
+const std::shared_ptr<BackendLoginUserPreferences>& Storage::getUserPreferences() const
+{
+	return loginUserPreferences;
 }
 
 
@@ -311,6 +320,11 @@ BackendUser* Storage::addUser (const QJsonObject& json, bool isLoggedInUser)
 	}
 
 	return user;
+}
+
+void Storage::setUserPreferences(const QJsonDocument& doc)
+{
+	loginUserPreferences = std::make_shared<BackendLoginUserPreferences>(doc);
 }
 
 void Storage::eraseTeam (const QString& teamID)

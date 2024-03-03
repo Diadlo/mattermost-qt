@@ -104,6 +104,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	 * which need to be displayer ad user names
 	 */
 	connect (&backend, &Backend::onAllTeamChannelsPopulated, [this] {
+		ui->channelList->addFavoritesChannelsList(backend);
 		ui->channelList->addGroupChannelsList (backend);
 		ui->channelList->addDirectChannelsList (backend);
 

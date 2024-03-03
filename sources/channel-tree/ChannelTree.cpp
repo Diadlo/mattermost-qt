@@ -30,7 +30,8 @@
 #include "team-item/GroupTeamItem.h"
 #include "backend/types/BackendTeam.h"
 #include "backend/Backend.h"
-#include "log.h"
+#include "log.h" 
+#include <unordered_set>
 
 namespace Mattermost {
 
@@ -115,6 +116,38 @@ void ChannelTree::addTeam (Backend& backend, BackendTeam& team)
 	});
 
 	backend.retrieveTeamMembers (team);
+	
+}
+
+void ChannelTree::addFavoritesChannelsList(Backend& backend)
+{
+	TeamItem* teamList = new DirectTeamItem(*this, backend, "Favorites", "0");
+	
+	auto& team = backend.getStorage().directChannels;
+	
+	takeTopLevelItem(indexOfTopLevelItem(teamList));
+	insertTopLevelItem(0, teamList);
+
+	header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+
+
+	// TODO: it really shouldn't capture storage like this
+	connect(&team, &BackendDirectChannelsTeam::onNewChannel, [this, teamList, storage = &backend.getStorage()](BackendChannel& channel) {
+		const auto& favs = storage->getUserPreferences()->getFavoriteChannels();
+		if (favs.find(channel.id) != favs.end())
+		{
+			teamList->addChannel(channel, parentWidget(), chatAreaStackedWidget);
+		}
+		});
+
+	const auto& favs = backend.getStorage().getUserPreferences()->getFavoriteChannels();
+	for (auto& channel : team.channels) {
+		if (favs.find(channel->id) != favs.end())
+		{
+			teamList->addChannel(*channel, parentWidget(), chatAreaStackedWidget);
+		}
+	}
 }
 
 void ChannelTree::addGroupChannelsList (Backend& backend)
