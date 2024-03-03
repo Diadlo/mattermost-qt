@@ -77,17 +77,7 @@ void LoginDialog::on_login_pushButton_clicked()
 	loginData.domain = ui->domain_lineEdit->text();
 	loginData.username = ui->username_lineEdit->text();
 	loginData.password = ui->password_lineEdit->text();
-	loginData.token = ui->token_lineEdit->text();
-
-	if (loginData.password.isEmpty() && loginData.token.isEmpty()) {
-		setError("Please enter your password or token.");
-		return;
-	}
-
-	if (!loginData.password.isEmpty() && !loginData.token.isEmpty()) {
-		setError("Password and token are not allowed at the same time. Please enter only one of them.");
-		return;
-	}
+	loginData.token = "";
 
 	loginData.saveToSettings (settings);
 	loginToServer (loginData);
