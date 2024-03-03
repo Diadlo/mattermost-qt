@@ -46,12 +46,6 @@
 #include "emoji/EmojiInfo.h"
 #include "log.h"
 
-/**
- * Get number of 'containers' needed for 'total' items, if each container
- * can hold 'capacity' items. For example, getting page count
- */
-#define CONTAINER_COUNT(total,capacity) (!(total)?0:((total)-1)/(capacity)+1)
-
 namespace Mattermost {
 
 namespace RequestTrackerID {
@@ -60,6 +54,15 @@ enum type {
     teamMember,
 };
 }
+
+namespace
+{
+    NetworkRequest makeGetTotalUsersRequest(uint32_t usersPerPage, uint32_t page)
+    {
+        return NetworkRequest("users?per_page=" + QString::number(usersPerPage) + "&page=" + QString::number(page));
+    }
+
+};
 
 Backend::Backend(QObject *parent)
 :QObject (parent)
@@ -244,6 +247,36 @@ void Backend::loginSuccess (const QJsonDocument& doc, const QNetworkReply& reply
     callback (NetworkRequest::getToken());
 }
 
+void Backend::getUsersRequest(const QJsonDocument& doc, uint32_t usersPerPage, uint32_t page)
+{
+
+    LOG_DEBUG("retrieveAllUsers reply");
+
+    QVector<QString> userIds;
+    userIds.reserve(200);
+
+    for (const auto& itemRef : doc.array()) {
+        BackendUser* user = storage.addUser(itemRef.toObject());
+        retrieveUserAvatar(user->id, user->update_at);
+        userIds.push_back(user->id);
+    }
+
+    retrieveMultipleUsersStatus(userIds, [] {
+        });
+
+    if (doc.array().isEmpty()) {
+        emit onAllUsers();
+        LOG_DEBUG("Get Users: Done ");
+    }
+    else
+    {
+        httpConnector.get(makeGetTotalUsersRequest(usersPerPage, page), HttpResponseCallback([this, usersPerPage, page](const QJsonDocument& doc)
+        {
+            getUsersRequest(doc, usersPerPage, page + 1);
+        }));
+    }
+}
+
 void Backend::reset ()
 {
     isLoggedIn = false;
@@ -315,7 +348,7 @@ void Backend::retrieveUserPreferences ()
 {
     NetworkRequest request ("users/" + getLoginUser().id + "/preferences");
 
-    httpConnector.get (request, HttpResponseCallback ([](const QJsonDocument& doc) {
+    httpConnector.get (request, HttpResponseCallback ([this](const QJsonDocument& doc) {
 
         LOG_DEBUG ("retrieveUserPreferences reply");
 
@@ -404,63 +437,17 @@ void Backend::retrieveTotalUsersCount (std::function<void(uint32_t)> callback)
 
 void Backend::retrieveAllUsers ()
 {
-    uint32_t usersPerPage = 200;
-
-    //+1, because the total_users_count value does NOT tell the total count that this request will return
-    uint32_t totalPages = CONTAINER_COUNT (storage.totalUsersCount, usersPerPage) + 1;
-    static uint32_t obtainedPages;
-
-    for (uint32_t page = 0; page < totalPages; ++page) {
-        NetworkRequest request ("users?per_page=" + QString::number(usersPerPage) + "&page=" + QString::number(page));
-
-        httpConnector.get (request, HttpResponseCallback ([this, page, totalPages] (const QJsonDocument& doc) {
-
-            LOG_DEBUG ("retrieveAllUsers reply");
-
-#if 0
-            QString jsonString = doc.toJson(QJsonDocument::Indented);
-            std::cout << jsonString.toStdString() << std::endl;
-#endif
-
-            QVector<QString> userIds;
-            userIds.reserve (200);
-
-            for (const auto &itemRef: doc.array()) {
-                BackendUser *user = storage.addUser (itemRef.toObject());
-                retrieveUserAvatar (user->id, user->update_at);
-                userIds.push_back (user->id);
-            }
-
-            retrieveMultipleUsersStatus (userIds, [] {
-            });
-
-            LOG_DEBUG ("Page " << page << " (" << obtainedPages << " of " << totalPages
-                       << "): users count: " << doc.array().size()
-                       << " (total: " << storage.users.size() << ")");
-        #if 0
-            for (auto& user: users) {
-                std::cout << user.id.toStdString() << " "
-                        << user.first_name.toStdString() <<    " "
-                        << user.last_name.toStdString() <<    " "
-                        << user.username.toStdString() <<    " "
-                        << std::endl;
-            }
-        #endif
-
-            ++obtainedPages;
-            if (obtainedPages == totalPages) {
-                emit onAllUsers ();
-                LOG_DEBUG ("Get Users: Done ");
-                obtainedPages = 0;
-            }
-        }));
-
-    }
+    // It was impossible to retrieve real user count by predicting page count.
+    // Send GET requests until response is empty.
+    const uint32_t usersPerPage = 200;
+    httpConnector.get(makeGetTotalUsersRequest(usersPerPage, 0), HttpResponseCallback([this, usersPerPage](const QJsonDocument& doc)
+    {
+        getUsersRequest(doc, usersPerPage, 0);
+    }));
 }
 
 void Backend::retrieveUserAvatar (QString userID, uint64_t lastUpdateTime)
 {
-    (void)lastUpdateTime;
     NetworkRequest request ("users/" + userID + "/image", true);
 
     //LOG_DEBUG ("getUserImage request");

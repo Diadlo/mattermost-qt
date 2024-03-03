@@ -243,6 +243,7 @@ signals:
     void onWebSocketDisconnect ();
 private:
     void loginSuccess (const QJsonDocument& data, const QNetworkReply& reply, std::function<void(const QString&)> callback);
+    void getUsersRequest(const QJsonDocument& doc, uint32_t usersPerPage, uint32_t page);
 private:
     Storage                            storage;
     ServerDialogsMap                serverDialogsMap;
