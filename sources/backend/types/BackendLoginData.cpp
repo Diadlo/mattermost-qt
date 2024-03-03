@@ -43,7 +43,6 @@ void BackendLoginData::saveToSettings (QSettings& settings) const
 bool BackendLoginData::areAllFieldsFilled () const
 {
 	return !domain.isEmpty()
-			&& !username.isEmpty()
 			&& !token.isEmpty();
 }
 

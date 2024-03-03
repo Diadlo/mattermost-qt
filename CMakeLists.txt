@@ -35,6 +35,7 @@ option(BUILD_MULTIMEDIA "Enable Multimedia" OFF)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Network REQUIRED)
 find_package(Qt5 COMPONENTS WebSockets REQUIRED)
+find_package(Qt5 COMPONENTS WebEngineWidgets REQUIRED)
 
 if(BUILD_MULTIMEDIA)
 	find_package(Qt5 COMPONENTS Multimedia REQUIRED)
@@ -62,16 +63,21 @@ else()
     ${SOURCES}
     resource.qrc
   )
-  
+
   if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	set_property(TARGET ${APPID} PROPERTY WIN32_EXECUTABLE true)
   endif()
-  
+
 endif()
 
 add_subdirectory (tools)
 
-target_link_libraries (${APPID} PRIVATE Qt5::Widgets Qt5::Network Qt5::WebSockets)
+target_link_libraries (${APPID} PRIVATE
+    Qt5::Widgets
+    Qt5::Network
+    Qt5::WebSockets
+    Qt5::WebEngineWidgets
+)
 
 if(UNIX)
 	include(GNUInstallDirs)
