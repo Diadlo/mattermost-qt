@@ -183,9 +183,9 @@ void BackendChannel::addPosts (const QJsonArray& orderArray, const QJsonObject& 
 	 * local posts are searched from newest to oldest
 	 */
 	std::list<BackendPost>::reverse_iterator currentLocalPost = posts.rbegin();
-
+#ifndef _WIN32
 #warning "Handle case of deleted post, that is not deleted locally"
-
+#endif
 	bool initialLoad = (posts.empty());
 	bool lastPostWasSkipped = false;
 
