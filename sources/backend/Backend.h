@@ -45,183 +45,183 @@ class Backend: public QObject
 {
     Q_OBJECT
 public:
-	explicit Backend (QObject *parent = nullptr);
+    explicit Backend (QObject *parent = nullptr);
 
-	bool autoLoginEnabled ();
+    bool autoLoginEnabled ();
 
-	void reset ();
+    void reset ();
 
-	//login to server (/users/login)
-	void login (const BackendLoginData& loginData, std::function<void(const QString&)> callback);
+    //login to server (/users/login)
+    void login (const BackendLoginData& loginData, std::function<void(const QString&)> callback);
 
-	//login retry - after a HTTP error
-	void loginRetry ();
+    //login retry - after a HTTP error
+    void loginRetry ();
 
-	//logout (/users/logout)
-	void logout (std::function<void ()> callback);
+    //logout (/users/logout)
+    void logout (std::function<void ()> callback);
 
-	//get specific user (/users/userID)
-	void retrieveUser (QString userID, std::function<void(const BackendUser&)> callback);
+    //get specific user (/users/userID)
+    void retrieveUser (QString userID, std::function<void(const BackendUser&)> callback);
 
-	//get user's preferences (/users/{user_id}/preferences)
-	void retrieveUserPreferences ();
+    //get user's preferences (/users/{user_id}/preferences)
+    void retrieveUserPreferences ();
 
-	void updateUserPreferences (const BackendUserPreferences& preferences);
+    void updateUserPreferences (const BackendUserPreferences& preferences);
 
-	//get user's status (/users/status/ids)
-	void retrieveMultipleUsersStatus (QVector<QString> userIDs, std::function<void()> callback);
+    //get user's status (/users/status/ids)
+    void retrieveMultipleUsersStatus (QVector<QString> userIDs, std::function<void()> callback);
 
-	//get count of all users in the system (users/stats)
-	void retrieveTotalUsersCount (std::function<void(uint32_t)> callback);
+    //get count of all users in the system (users/stats)
+    void retrieveTotalUsersCount (std::function<void(uint32_t)> callback);
 
-	//get all users (/users?per_page=200&page=pageIdx);
-	void retrieveAllUsers ();
+    //get all users (/users?per_page=200&page=pageIdx);
+    void retrieveAllUsers ();
 
-	//get user's avatar image (/users/userID/image). Emits BackendUser::onAvatarChanged
-	void retrieveUserAvatar (QString userID, uint64_t lastUpdateTime = 0);
+    //get user's avatar image (/users/userID/image). Emits BackendUser::onAvatarChanged
+    void retrieveUserAvatar (QString userID, uint64_t lastUpdateTime = 0);
 
-	//get file (files/fileID)
-	void retrieveFile (QString fileID, std::function<void(const QByteArray&)> callback);
+    //get file (files/fileID)
+    void retrieveFile (QString fileID, std::function<void(const QByteArray&)> callback);
 
-	//get own teams (/users/me/teams)
-	void retrieveOwnTeams (std::function<void(BackendTeam&)> callback);
+    //get own teams (/users/me/teams)
+    void retrieveOwnTeams (std::function<void(BackendTeam&)> callback);
 
-	//get all public teams on the server (/teams)
-	void retrieveAllPublicTeams ();
+    //get all public teams on the server (/teams)
+    void retrieveAllPublicTeams ();
 
-	//get a team (/teams/teamID)
-	void retrieveTeam (QString teamID);
+    //get a team (/teams/teamID)
+    void retrieveTeam (QString teamID);
 
-	//get all public channels for a team (/teams/teamID/channels)
-	void retrieveTeamPublicChannels (QString teamID, std::function<void(std::list<BackendChannel>&)> callback);
+    //get all public channels for a team (/teams/teamID/channels)
+    void retrieveTeamPublicChannels (QString teamID, std::function<void(std::list<BackendChannel>&)> callback);
 
-	//get own channel memberships (/users/me/teams/teamID/channels)
-	void retrieveOwnChannelMembershipsForTeam (BackendTeam& team, std::function<void(BackendChannel&)> callback);
+    //get own channel memberships (/users/me/teams/teamID/channels)
+    void retrieveOwnChannelMembershipsForTeam (BackendTeam& team, std::function<void(BackendChannel&)> callback);
 
-	//get own channel memberships from all teams (/users/me/channel_members)
-	//void retrieveOwnAllChannelMemberships (std::function<void()> callback);
+    //get own channel memberships from all teams (/users/me/channel_members)
+    //void retrieveOwnAllChannelMemberships (std::function<void()> callback);
 
-	//get multiple team members (/teams/{teamID}/members)
-	void retrieveTeamMembers (BackendTeam& team, int page = 0);
+    //get multiple team members (/teams/{teamID}/members)
+    void retrieveTeamMembers (BackendTeam& team, int page = 0);
 
-	//get a single team member (/teams/teamID/members/{userID})
-	void retrieveTeamMember (BackendTeam& team, const BackendUser& user);
+    //get a single team member (/teams/teamID/members/{userID})
+    void retrieveTeamMember (BackendTeam& team, const BackendUser& user);
 
-	//get a channel (/channels/channelID)
-	void retrieveChannel (BackendTeam& team, QString channelID);
-	void retrieveDirectChannel (QString channelID);
+    //get a channel (/channels/channelID)
+    void retrieveChannel (BackendTeam& team, QString channelID);
+    void retrieveDirectChannel (QString channelID);
 
-	//get posts in a channel (/channels/{channel_id}/posts)
-	void retrieveChannelPosts (BackendChannel& channel, int page, int perPage);
+    //get posts in a channel (/channels/{channel_id}/posts)
+    void retrieveChannelPosts (BackendChannel& channel, int page, int perPage);
 
-	//get channel's pinned posts (/channels/{channel_id}/pinned)
-	void retrieveChannelPinnedPosts (BackendChannel& channel);
+    //get channel's pinned posts (/channels/{channel_id}/pinned)
+    void retrieveChannelPinnedPosts (BackendChannel& channel);
 
-	//get older posts in a channel (before the first one) (/channels/ID/posts)
-	void retrieveChannelOlderPosts (BackendChannel& channel, int perPage);
+    //get older posts in a channel (before the first one) (/channels/ID/posts)
+    void retrieveChannelOlderPosts (BackendChannel& channel, int perPage);
 
-	//get first unread post in a channel (/users/{user_id}/channels/{channel_id}/posts/unread)
-	void retrieveChannelUnreadPost (BackendChannel& channel, std::function<void(const QString&)> responseHandler);
+    //get first unread post in a channel (/users/{user_id}/channels/{channel_id}/posts/unread)
+    void retrieveChannelUnreadPost (BackendChannel& channel, std::function<void(const QString&)> responseHandler);
 
-	//get all channel members (/channels/{channel_id}/members)
-	void retrieveChannelMembers (BackendChannel& channel, std::function<void ()> callback);
+    //get all channel members (/channels/{channel_id}/members)
+    void retrieveChannelMembers (BackendChannel& channel, std::function<void ()> callback);
 
-	//get a single channel member (/channels/{channel_id}/members/{user_id})
-	void retrieveChannelMember (BackendChannel& channel, const BackendUser& user);
+    //get a single channel member (/channels/{channel_id}/members/{user_id})
+    void retrieveChannelMember (BackendChannel& channel, const BackendUser& user);
 
-	//get poll metadata (/plugins/com.github.matterpoll.matterpoll/api/v1/polls/{poll_id}/metadata)
-	void retrievePollMetadata (BackendPoll& poll);
+    //get poll metadata (/plugins/com.github.matterpoll.matterpoll/api/v1/polls/{poll_id}/metadata)
+    void retrievePollMetadata (BackendPoll& poll);
 
-	//mark the channel as viewed (/channels/members/me/view), so that the server knows that the channel is viewed
-	void markChannelAsViewed (BackendChannel& channel);
+    //mark the channel as viewed (/channels/members/me/view), so that the server knows that the channel is viewed
+    void markChannelAsViewed (BackendChannel& channel);
 
-	//edit channel properties (PUT /channels/{channel_id})
-	void editChannelProperties (BackendChannel& channel, const BackendChannelProperties& newProperties);
+    //edit channel properties (PUT /channels/{channel_id})
+    void editChannelProperties (BackendChannel& channel, const BackendChannelProperties& newProperties);
 
-	//add new post in a channel (/posts)
-	void addPost (BackendChannel& channel, const QString& message, const QList<QString>& attachments, const QString& rootID = "");
+    //add new post in a channel (/posts)
+    void addPost (BackendChannel& channel, const QString& message, const QList<QString>& attachments, const QString& rootID = "");
 
-	//edit post (/posts/{post_id}/patch)
-	void editPost (const QString& postID, const QString& message, const QList<QString>& attachments);
+    //edit post (/posts/{post_id}/patch)
+    void editPost (const QString& postID, const QString& message, const QList<QString>& attachments);
 
-	//delete a post (/posts/{post_id})
-	void deletePost (const QString postID);
+    //delete a post (/posts/{post_id})
+    void deletePost (const QString postID);
 
-	//pin a post (/posts/{post_id}/pin)
-	void pinPost (const QString postID);
+    //pin a post (/posts/{post_id}/pin)
+    void pinPost (const QString postID);
 
-	//add a poll (/actions/dialogs/submit /plugins/com.github.matterpoll.matterpoll/api/v1/polls/create)
-	void addPoll (BackendChannel& channel, const BackendNewPollData& pollData);
+    //add a poll (/actions/dialogs/submit /plugins/com.github.matterpoll.matterpoll/api/v1/polls/create)
+    void addPoll (BackendChannel& channel, const BackendNewPollData& pollData);
 
-	//add a reaction to a post (/reactions)
-	void addPostReaction (const QString& postID, const QString& emojiName);
+    //add a reaction to a post (/reactions)
+    void addPostReaction (const QString& postID, const QString& emojiName);
 
-	//send a post action (/posts/{post_id}/actions/{action})
-	void sendPostAction (const BackendPost& post, const QString& action);
+    //send a post action (/posts/{post_id}/actions/{action})
+    void sendPostAction (const BackendPost& post, const QString& action);
 
-	//upload a file, to be added to a post (/files)
-	void uploadFile (BackendChannel& channel, const QString& filePath, std::function<void(QString)> responseHandler);
+    //upload a file, to be added to a post (/files)
+    void uploadFile (BackendChannel& channel, const QString& filePath, std::function<void(QString)> responseHandler);
 
-	//create a direct channel with given user (/channels/direct)
-	void createDirectChannel (const BackendUser& user);
+    //create a direct channel with given user (/channels/direct)
+    void createDirectChannel (const BackendUser& user);
 
-	//add a user to a channel (/channels/{channel_id}/members)
-	void addUserToChannel (const BackendChannel& channel, const QString& userID);
+    //add a user to a channel (/channels/{channel_id}/members)
+    void addUserToChannel (const BackendChannel& channel, const QString& userID);
 
-	//remove a user from a channel (/channels/{channel_id}/members/{user_id})
-	void removeUserFromChannel (const BackendChannel& channel, const QString& userID);
+    //remove a user from a channel (/channels/{channel_id}/members/{user_id})
+    void removeUserFromChannel (const BackendChannel& channel, const QString& userID);
 
-	//join a channel (addUserToChannel for loginUser)
-	void joinChannel (const BackendChannel& channel);
+    //join a channel (addUserToChannel for loginUser)
+    void joinChannel (const BackendChannel& channel);
 
-	//leave a channel (/channels/{channel_id}/members/{user_id})
-	void leaveChannel (const BackendChannel& channel);
+    //leave a channel (/channels/{channel_id}/members/{user_id})
+    void leaveChannel (const BackendChannel& channel);
 
-	//add a user to a team (/teams/{team_id}/members)
-	void addUserToTeam (const BackendTeam& team, const QString& userID);
+    //add a user to a team (/teams/{team_id}/members)
+    void addUserToTeam (const BackendTeam& team, const QString& userID);
 
-	//remove a user from a team (/teams/{team_id}/members/{user_id})
-	void removeUserFromTeam (const BackendTeam& team, const QString& userID);
+    //remove a user from a team (/teams/{team_id}/members/{user_id})
+    void removeUserFromTeam (const BackendTeam& team, const QString& userID);
 
-	//send a submit dialog response. In most cases, dialogs are handled by the UI
-	void sendSubmitDialog (const QJsonDocument& json);
+    //send a submit dialog response. In most cases, dialogs are handled by the UI
+    void sendSubmitDialog (const QJsonDocument& json);
 
-	//retrieve custom emojis (/emoji)
-	void retrieveCustomEmojis ();
+    //retrieve custom emojis (/emoji)
+    void retrieveCustomEmojis ();
 
-	//retrieve custom emojis (/emoji/{emoji_id}/image)
-	void retrieveCustomEmojiImage (const QString& emojiID, std::function <void(QByteArray)> callback);
+    //retrieve custom emojis (/emoji/{emoji_id}/image)
+    void retrieveCustomEmojiImage (const QString& emojiID, std::function <void(QByteArray)> callback);
 
-	const BackendUser& getLoginUser () const;
+    const BackendUser& getLoginUser () const;
 
-	void setCurrentChannel (BackendChannel& channel);
+    void setCurrentChannel (BackendChannel& channel);
 
-	BackendChannel* getCurrentChannel () const;
+    BackendChannel* getCurrentChannel () const;
 
-	Storage& getStorage ();
+    Storage& getStorage ();
 
-	ServerDialogsMap& getServerDialogsMap ();
+    ServerDialogsMap& getServerDialogsMap ();
 signals:
 
-	/**
-	 * Called when unread posts for a channel are received at startup
-	 * @param channel
-	 */
-	void onUnreadPostsAtStartup (const BackendChannel&);
+    /**
+     * Called when unread posts for a channel are received at startup
+     * @param channel
+     */
+    void onUnreadPostsAtStartup (const BackendChannel&);
 
 
-	/**
-	 * Called when a channel is being viewed, either from this or from another Mattermost instance
-	 * @param channel channel
-	 */
-	void onChannelViewed (const BackendChannel& channel);
+    /**
+     * Called when a channel is being viewed, either from this or from another Mattermost instance
+     * @param channel channel
+     */
+    void onChannelViewed (const BackendChannel& channel);
 
-	/**
-	 * Called when new post arrives. Same notification as Channel::onNewPost
-	 * @param channel channel, in which the post was added
-	 * @param post post
-	 */
-	void onNewPost (BackendChannel& channel, const BackendPost& post);
+    /**
+     * Called when new post arrives. Same notification as Channel::onNewPost
+     * @param channel channel, in which the post was added
+     * @param post post
+     */
+    void onNewPost (BackendChannel& channel, const BackendPost& post);
     void onAllUsers ();
 
     /**
@@ -234,7 +234,7 @@ signals:
      * In most cases this is a new team
      * @param team
      */
-	void onAddedToTeam (BackendTeam&);
+    void onAddedToTeam (BackendTeam&);
 
     void onNetworkError (uint32_t errorNumber, const QString& errorText);
     void onHttpError (uint32_t errorNumber, const QString& errorText);
@@ -244,21 +244,21 @@ signals:
 private:
     void loginSuccess (const QJsonDocument& data, const QNetworkReply& reply, std::function<void(const QString&)> callback);
 private:
-    Storage							storage;
-    ServerDialogsMap				serverDialogsMap;
+    Storage                            storage;
+    ServerDialogsMap                serverDialogsMap;
 
-    HTTPConnector 					httpConnector;
-    WebSocketEventHandler			webSocketEventHandler;
-    WebSocketConnector				webSocketConnector;
-    BackendLoginData				loginData;
-    QNetworkDiskCache				attachmentsCache;
-    RequestTracker					requestTracker;
-    BackendChannel*					currentChannel;
-    QTimer 							timeoutTimer;
-    bool							isLoggedIn;
-    bool							autoLoginEnabledFlag;
-    uint32_t						nonFilledTeams;
-    uint64_t						lastStartTime;
+    HTTPConnector                     httpConnector;
+    WebSocketEventHandler            webSocketEventHandler;
+    WebSocketConnector                webSocketConnector;
+    BackendLoginData                loginData;
+    QNetworkDiskCache                attachmentsCache;
+    RequestTracker                    requestTracker;
+    BackendChannel*                    currentChannel;
+    QTimer                             timeoutTimer;
+    bool                            isLoggedIn;
+    bool                            autoLoginEnabledFlag;
+    uint32_t                        nonFilledTeams;
+    uint64_t                        lastStartTime;
 };
 
 } /* namespace Mattermost */
