@@ -31,6 +31,7 @@
 #include "backend/types/BackendTeam.h"
 #include "backend/Backend.h"
 #include "log.h"
+#include <unordered_set>
 
 namespace Mattermost {
 
@@ -115,6 +116,48 @@ void ChannelTree::addTeam (Backend& backend, BackendTeam& team)
 	});
 
 	backend.retrieveTeamMembers (team);
+
+}
+
+void subscribeOnTeamChange(BackendDirectChannelsTeam& team, Backend& backend, std::function<void(BackendChannel&)> addFavInUi)
+{
+	// TODO: it really shouldn't capture storage like this
+	QObject::connect(&team, &BackendDirectChannelsTeam::onNewChannel, [storage = &backend.getStorage(), addFavInUi](BackendChannel& channel) {
+		const auto& favs = storage->getUserPreferences()->getFavoriteChannels();
+		if (favs.find(channel.id) != favs.end())
+		{
+			addFavInUi(channel);
+		}
+	});
+}
+
+void ChannelTree::addFavoritesChannelsList(Backend& backend)
+{
+	TeamItem* teamList = new DirectTeamItem(*this, backend, "Favorites", "0");
+
+	takeTopLevelItem(indexOfTopLevelItem(teamList));
+	insertTopLevelItem(0, teamList);
+
+	header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+
+	auto addFavInUi = [this, teamList](BackendChannel& channel) {
+		teamList->addChannel(channel, parentWidget(), chatAreaStackedWidget);
+	};
+
+	subscribeOnTeamChange(backend.getStorage().directChannels, backend, addFavInUi);
+	subscribeOnTeamChange(backend.getStorage().groupChannels, backend, addFavInUi);
+
+	// TODO: Subscribe to changes in favorites
+	// TODO: Subscribe to new channel
+	for (auto& channel : backend.getStorage().channels.values())
+	{
+		const auto& favs = backend.getStorage().getUserPreferences()->getFavoriteChannels();
+		if (favs.find(channel->id) != favs.end())
+		{
+			addFavInUi(*channel);
+		}
+	}
 }
 
 void ChannelTree::addGroupChannelsList (Backend& backend)

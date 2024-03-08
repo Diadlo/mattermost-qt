@@ -30,6 +30,8 @@
 #include "backend/types/BackendUser.h"
 #include "backend/types/BackendTeam.h"
 #include "backend/types/BackendDirectChannelsTeam.h"
+#include "backend/types/BackendLoginUserPreferences.h"
+#include <QJsonDocument>
 
 namespace Mattermost {
 
@@ -51,6 +53,7 @@ public:
 	BackendUser* getUserById (const QString& userID);
 	const BackendUser* getUserById (const QString& userID) const;
 
+	const std::shared_ptr<BackendLoginUserPreferences>& getUserPreferences() const;
 	/**
 	 * Get user's display name by given user ID.
 	 * If no user is found, the user ID is returned.
@@ -68,6 +71,7 @@ public:
 	BackendChannel* addGroupChannel (const QJsonObject& json);
 
 	BackendUser* addUser (const QJsonObject& json, bool isLoggedInUser = false);
+	void setUserPreferences(const QJsonDocument& doc);
 
 	void eraseTeam (const QString& teamID);
 
@@ -82,6 +86,7 @@ public:
 	QMap<QString, BackendChannel*> 					directChannelsByUser;
 	std::map<QString, BackendUser>					users;
 	BackendUser*									loginUser;
+	std::shared_ptr<BackendLoginUserPreferences>    loginUserPreferences;
 	BackendUser*									matterpollUser;
 	uint32_t										totalUsersCount;
 };
