@@ -42,6 +42,8 @@ SettingsWindow::SettingsWindow(Settings& settings, QWidget *parent) :
 	ui->imageMaxWidthValue->setText(QString::number(m_settings.getImageMaxWidth()));
 	ui->imageMaxHeightValue->setText(QString::number(m_settings.getImageMaxHeight()));
 
+	ui->closeToTray->setChecked(m_settings.getCloseToTray());
+
 	connect (ui->downloadLocationButton, &QPushButton::clicked, [this] {
 		QDir defaultDir(ui->downloadLocationValue->text());
 
@@ -63,6 +65,7 @@ void SettingsWindow::applyNewSettings ()
 	m_settings.setDownloadAsk(ui->askLocationCheckBox->isChecked());
 	m_settings.setImageMaxWidth(ui->imageMaxWidthValue->text().toInt());
 	m_settings.setImageMaxHeight(ui->imageMaxHeightValue->text().toInt());
+	m_settings.setCloseToTray(ui->closeToTray->isChecked());
 }
 
 } /* namespace Mattermost */

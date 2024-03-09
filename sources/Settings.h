@@ -67,8 +67,13 @@ public:
     void setToken(const QString& token);
     QString getToken() const;
 
+    // Emoji settings
     void setEmojiFavorites(const QByteArray& favorites);
     QByteArray getEmojiFavorites() const;
+
+    // Tray settings
+    void setCloseToTray(bool close);
+    bool getCloseToTray() const;
 
 private:
     QSettings m_settings;

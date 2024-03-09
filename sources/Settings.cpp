@@ -120,4 +120,13 @@ QByteArray Settings::getEmojiFavorites() const {
     return m_settings.value("emoji_favorites").toByteArray();
 }
 
+void Settings::setCloseToTray(bool close) {
+    m_settings.setValue("closeToTray", close);
+    m_settings.sync();
+}
+
+bool Settings::getCloseToTray() const {
+    return m_settings.value("closeToTray", false).toBool();
+}
+
 } /* namespace Mattermost */

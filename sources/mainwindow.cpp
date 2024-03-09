@@ -288,7 +288,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		return QMainWindow::closeEvent (event);
 	}
 
-	if (trayIcon.isVisible()) {
+	if (Settings::getInstance().getCloseToTray()) {
 		hide();
 		event->ignore();
 	}
