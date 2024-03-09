@@ -34,8 +34,7 @@ class QJsonDocument;
 
 namespace Mattermost {
 
-    class BackendLoginUserPreferences final : public QObject {
-        Q_OBJECT
+    class BackendLoginUserPreferences final {
     public:
         BackendLoginUserPreferences() = default;
         BackendLoginUserPreferences(const BackendLoginUserPreferences&) = delete;
