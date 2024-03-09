@@ -53,7 +53,6 @@ if(ANDROID)
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    mainwindow.ui
     logindialog.cpp
     logindialog.h
     logindialog.ui

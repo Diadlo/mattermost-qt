@@ -28,11 +28,19 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class QHBoxLayout;
+class QVBoxLayout;
+class QToolButton;
+class QFrame;
+class QLabel;
 class QSystemTrayIcon;
 class QTreeWidgetItem;
+class QStackedWidget;
+class QSplitter;
 
 namespace Mattermost {
 
+class ChannelTree;
 class ChatArea;
 class Backend;
 class BackendChannel;
@@ -81,8 +89,12 @@ public:
 private:
 	void createMenu ();
 	void reload ();
+
+	void setupUi();
+	void setupTopLeftWidget();
+	void retranslateUi();
+
 private:
-	std::unique_ptr<Ui::MainWindow>		ui;
 	QSystemTrayIcon&					trayIcon;
 	ChooseEmojiDialogWrapper			chooseEmojiDialog;
 	QSet<const BackendChannel*>			channelsWithNewPosts;
@@ -91,6 +103,23 @@ private:
 	QMenu*								mainMenu;
 	SettingsWindow*						settingsWindow;
 	bool								doDeinit;
+
+	QSplitter *m_splitter;
+    QAction *m_actionAbout;
+    QGridLayout *m_gridLayout_2;
+    QLabel *m_userIcon_label;
+    QLabel *m_usernameLabel;
+    QLabel *m_statusLabel;
+    QToolButton *m_toolButton;
+
+	// tl = top left
+    QFrame *m_topLeft_frame;
+    QHBoxLayout *m_tlHorizontalLayout;
+    QVBoxLayout *m_tlVerticalLayout;
+
+    Mattermost::ChannelTree *m_channelList;
+    QStackedWidget *m_chatAreaStackedWidget;
+    QMenuBar *m_menubar;
 };
 
 } /* namespace Mattermost */
