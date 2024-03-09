@@ -52,7 +52,6 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 ,chooseEmojiDialog(Settings::getInstance(), this)
 ,backend (_backend)
 ,currentTeamRestoredFromSettings (false)
-,doDeinit (false)
 {
 	LOG_DEBUG ("MainWindow create start");
 
@@ -304,19 +303,13 @@ void MainWindow::createMenu ()
 	mainMenu = new QMenu (m_toolButton);
 
 	QMenu* fileMenu = mainMenu->addMenu ("File");
-	fileMenu->addAction ("Logout", [this] {
-
-		backend.logout ([this] {
-			doDeinit = true;
-			QMainWindow::close ();
-			LOG_DEBUG ("Logout done");
-		});
-	});
+	fileMenu->addAction ("Logout", this, &MainWindow::loggedOut);
 
 	mainMenu->addAction ("Settings", [this] {
 		Settings& settings = Settings::getInstance();
 		settingsWindow = new SettingsWindow(settings, this);
 
+		// TODO: Update views according to the new settings without reloading
 		connect (settingsWindow, &QDialog::accepted, [this] {
 
 			if (QMessageBox::question (this, "Reload?", "In order to apply some settings, Mattermost has to be reloaded.\n"
@@ -324,7 +317,8 @@ void MainWindow::createMenu ()
 
 				settingsWindow->applyNewSettings ();
 			}
-			reload ();
+
+			emit this->reloaded();
 		});
 
 		settingsWindow->show();
@@ -365,15 +359,6 @@ void MainWindow::dragMoveEvent (QDragMoveEvent*)
 	qDebug() << "dragMove " << mapToGlobal(pos());
 }
 
-void MainWindow::reload ()
-{
-	QTimer::singleShot(0, [this] {
-		backend.reset();
-		doDeinit = true;
-		QMainWindow::close ();
-	});
-}
-
 void MainWindow::changeEvent (QEvent* event)
 {
 	QWidget::changeEvent(event);
@@ -404,16 +389,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
 	qDebug() << "closeEvent";
 
-	if (doDeinit) {
-		qDebug() << "QMainWindow closeEvent";
-		saveState ();
-		return QMainWindow::closeEvent (event);
-	}
+	saveState();
 
 	if (Settings::getInstance().getCloseToTray()) {
 		hide();
-		event->ignore();
+	} else {
+		emit exited();
 	}
+	event->ignore();
 }
 
 void MainWindow::initializationComplete ()

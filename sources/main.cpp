@@ -26,6 +26,7 @@
 #include "mainwindow.h"
 #include "backend/Backend.h"
 #include "config/Config.h"
+#include "Settings.h"
 
 namespace Mattermost {
 
@@ -36,7 +37,7 @@ public:
 	void openLoginWindow ();
 	void showWindow ();
 	void toggleShowWindow ();
-	void reopen ();
+	void createMainWindow();
 private:
 	std::unique_ptr<MainWindow>			mainWindow;
 	std::unique_ptr<QSystemTrayIcon> 	trayIcon;
@@ -56,7 +57,6 @@ inline MattermostApplication::MattermostApplication (int& argc, char *argv[])
 	trayIcon->setToolTip(tr("Mattermost Qt"));
 	trayIcon->setContextMenu (trayIconMenu.get());
 	trayIcon->show();
-	connect (this, &QGuiApplication::lastWindowClosed, this, &MattermostApplication::reopen);
 
 	connect (trayIcon.get(), &QSystemTrayIcon::messageClicked, this, &MattermostApplication::showWindow);
 
@@ -76,13 +76,34 @@ void MattermostApplication::openLoginWindow ()
 	loginDialog->open();
 	currentWindow = loginDialog;
 
-	connect (loginDialog, &LoginDialog::accepted, [this] {
-		//create Main Window and open it, after successful login
+	connect (loginDialog, &LoginDialog::accepted, [=] {
+		assert(loginDialog != nullptr);
+		loginDialog->close();
 		loginDialog = nullptr;
-		mainWindow = std::make_unique<MainWindow> (nullptr, *trayIcon, backend);
-		mainWindow->show();
-		currentWindow = mainWindow.get();
+		createMainWindow();
 	});
+}
+
+void MattermostApplication::createMainWindow()
+{
+	mainWindow = std::make_unique<MainWindow> (nullptr, *trayIcon, backend);
+	connect(mainWindow.get(), &MainWindow::exited, [=] {
+		mainWindow = nullptr;
+		QApplication::quit();
+	});
+	connect(mainWindow.get(), &MainWindow::loggedOut, [=] {
+		mainWindow = nullptr;
+		openLoginWindow();
+		backend.logout([]{});
+	});
+	connect(mainWindow.get(), &MainWindow::reloaded, [=] {
+		mainWindow = nullptr;
+		backend.reset();
+		// We open login window to do auto login again
+		openLoginWindow();
+	});
+	currentWindow = mainWindow.get();
+	showWindow();
 }
 
 inline void MattermostApplication::showWindow ()
@@ -103,18 +124,6 @@ inline void MattermostApplication::toggleShowWindow ()
 	} else {
 		currentWindow->show ();
 	}
-}
-
-inline void MattermostApplication::reopen ()
-{
-	qDebug () << "lastWindowClosed";
-
-	if (!mainWindow) {
-		return;
-	}
-
-	mainWindow.reset(nullptr);
-	openLoginWindow ();
 }
 
 } /* namespace Mattermost */

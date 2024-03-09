@@ -86,9 +86,14 @@ public:
 
 	void moveEvent (QMoveEvent* event) override;
 	void dragMoveEvent (QDragMoveEvent* event) override;
+
+signals:
+	void exited();
+	void loggedOut();
+	void reloaded();
+
 private:
 	void createMenu ();
-	void reload ();
 
 	void setupUi();
 	void setupTopLeftWidget();
@@ -102,7 +107,6 @@ private:
 	bool								currentTeamRestoredFromSettings;
 	QMenu*								mainMenu;
 	SettingsWindow*						settingsWindow;
-	bool								doDeinit;
 
 	QSplitter *m_splitter;
     QAction *m_actionAbout;
