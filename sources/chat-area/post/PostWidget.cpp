@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QResizeEvent>
+#include <QRegularExpression>
 #include "backend/Backend.h"
 #include "backend/types/BackendPost.h"
 #include "backend/emoji/EmojiInfo.h"
@@ -47,7 +48,13 @@ PostWidget::PostWidget (Backend& backend, BackendPost &post, QWidget *parent, Ch
 		ui->authorName->setStyleSheet("QLabel { color : blue; }");
 	}
 
-	ui->message->setText (formatMessageText (post.message));
+	ui->message->setText(formatMessageText(post.message));
+	ui->message->setTextFormat(Qt::MarkdownText);
+	ui->message->setTextInteractionFlags(
+		Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse|Qt::TextBrowserInteraction
+	);
+	ui->message->setOpenExternalLinks(true);
+
 	ui->time->setText (getMessageTimeString (post.create_at));
 
 	if (!post.author || post.author->avatar.isEmpty()) {
@@ -218,56 +225,21 @@ static void replaceEmojis (QString& str)
 
 }
 
-QString PostWidget::formatMessageText (const QString& str)
+QString PostWidget::formatMessageText (const QString& input)
 {
-	QString ret (str.toHtmlEscaped ());
-	ret.replace("\n", "<br>");
+	QString str = input;
+	// Default markdown doesn't interpret single newlines as line breaks,
+	// but Mattermost does.
+	// I haven't found a way to add *new line* in Qt. Only new paragraph.
+	// So we need to replace single newlines with two newlines.
+	str.replace("\n", "\n\n");
 
-	int linkStart = 0;
-	int linkEnd = 0;
+	// Also Mattermost interprets many newlines as one new paragraph.
+	// So we need to replace multiple newlines with two newlines.
+	str.replace(QRegularExpression("\n{3,}"), "\n\n");
 
-	replaceEmojis (ret);
-
-	do {
-
-		QLatin1String lookups[2] = { QLatin1String ("http://"), QLatin1String ("https://") };
-		QLatin1String* useLookup = nullptr;
-
-		for (auto& lookup: lookups) {
-			linkStart = ret.indexOf (lookup, linkEnd);
-
-			if (linkStart != -1) {
-				useLookup = &lookup;
-				break;
-			}
-		}
-
-		if (!useLookup) {
-			break;
-		}
-
-		//poor man's find_first_of - there is no such thing in QT, and std::string is not aware of multibyte characters
-		for (linkEnd = linkStart + useLookup->size(); linkEnd < ret.size(); ++linkEnd) {
-			if (ret.at (linkEnd) == ' ' || ret.at (linkEnd) == '<') {
-				break;
-			}
-		}
-
-		if (linkEnd == -1) {
-			linkEnd = ret.size();
-		}
-
-		size_t size = linkEnd - linkStart;
-
-		ret.insert (linkEnd, "\">" + QStringRef (&ret, linkStart,  size) + "</a>");
-		ret.insert (linkStart, "<a href=\"");
-
-		linkEnd += size + 15;
-	} while (linkStart != -1);
-
-	//std::cout << str.toStdString() << std::endl;
-	//std::cout << ret.toStdString() << std::endl;
-	return ret;
+	replaceEmojis(str);
+	return str;
 }
 
 QString PostWidget::getMessageTimeString (uint64_t timestamp)
