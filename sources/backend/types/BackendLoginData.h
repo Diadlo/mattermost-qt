@@ -25,21 +25,21 @@
 #pragma once
 
 #include <QString>
-#include <QSettings>
 
 namespace Mattermost {
 
+class Settings;
+
 class BackendLoginData {
 public:
-	void loadFromSettings (const QSettings& settings);
-	void saveToSettings (QSettings& settings)	const;
-	bool areAllFieldsFilled () 					const;
+	void loadFromSettings(const Settings& settings);
+	void saveToSettings(Settings& settings) const;
+	bool areAllFieldsFilled() const;
 public:
-	QString 	domain;
-	QString 	username;
-	QString 	password;
-	QString		token;
-	//QString 	alias;
+	QString domain;
+	QString username;
+	QString password;
+	QString	token;
 };
 
 } /* namespace Mattermost */

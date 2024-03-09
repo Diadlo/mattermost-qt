@@ -33,12 +33,13 @@ class Backend;
 class BackendFile;
 struct FilePreviewData;
 class FilePreview;
+class Settings;
 
 class AttachedImageFile: public QWidget {
     Q_OBJECT
 
 public:
-    explicit AttachedImageFile (Backend& backend, const BackendFile& file, const QString& authorName, QWidget *parent = nullptr);
+    explicit AttachedImageFile(Settings& settings, Backend& backend, const BackendFile& file, const QString& authorName, QWidget *parent = nullptr);
     ~AttachedImageFile();
 private:
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -49,6 +50,7 @@ private:
     Ui::AttachedImageFile*	ui;
     FilePreviewData			filePreviewData;
     static std::map <const QWidget*, FilePreview*>	currentlyOpenFiles;
+    Settings                &m_settings;
 };
 
 } /* namespace Mattermost */

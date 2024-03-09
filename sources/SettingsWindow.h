@@ -21,24 +21,26 @@
 
 #include <QDialog>
 
-
 namespace Ui {
 class SettingsWindow;
 }
 
 namespace Mattermost {
 
+class Settings;
+
 class SettingsWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SettingsWindow(QWidget *parent = nullptr);
+    explicit SettingsWindow(Settings &settings, QWidget *parent = nullptr);
     ~SettingsWindow();
 public:
     void applyNewSettings ();
 private:
     Ui::SettingsWindow *ui;
+    Settings& m_settings;
 };
 
 } /* namespace Mattermost */

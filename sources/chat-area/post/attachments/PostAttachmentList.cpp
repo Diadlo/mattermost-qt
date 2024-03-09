@@ -26,6 +26,7 @@
 #include "AttachedBinaryFile.h"
 #include "AttachedImageFile.h"
 #include "AttachedVideoFile.h"
+#include "Settings.h"
 #include "../PostWidget.h"
 #include "backend/types/BackendFile.h"
 
@@ -57,10 +58,11 @@ void PostAttachmentList::addFile (const BackendFile& file, const QString& author
 		fileWidget = new AttachedVideoFile (backend, file, this);
 	} else
 #endif
+	Settings& settings = Settings::getInstance();
 	if (file.mini_preview.isEmpty()) {
-		fileWidget = new AttachedBinaryFile (backend, file, this);
+		fileWidget = new AttachedBinaryFile(settings, backend, file, this);
 	} else {
-		fileWidget = new AttachedImageFile (backend, file, authorName, this);
+		fileWidget = new AttachedImageFile(settings, backend, file, authorName, this);
 		sizeKnown = false;
 		connect ((AttachedImageFile*)fileWidget, &AttachedImageFile::dimensionsChanged, [newItem, fileWidget, this] {
 			newItem->setSizeHint(QSize (fileWidget->width(), fileWidget->height() + 10));

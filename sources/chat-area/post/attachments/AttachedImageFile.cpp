@@ -22,7 +22,6 @@
 
 #include <QDebug>
 #include <QFileDialog>
-#include <QSettings>
 #include <QMenu>
 #include "backend/types/BackendFile.h"
 #include "backend/Backend.h"
@@ -32,9 +31,10 @@ namespace Mattermost {
 
 std::map <const QWidget*, FilePreview*> AttachedImageFile::currentlyOpenFiles;
 
-AttachedImageFile::AttachedImageFile (Backend& backend, const BackendFile& file, const QString& authorName, QWidget *parent)
+AttachedImageFile::AttachedImageFile(Settings& settings, Backend& backend, const BackendFile& file, const QString& authorName, QWidget *parent)
 :QWidget(parent)
 ,ui(new Ui::AttachedImageFile)
+,m_settings(settings)
 {
     ui->setupUi(this);
 
@@ -44,10 +44,9 @@ AttachedImageFile::AttachedImageFile (Backend& backend, const BackendFile& file,
 
     backend.retrieveFile (file.id, [&file, authorName, this] (const QByteArray& fileContents){
 
-		QSettings settings;
-
-		int maxWidth = settings.value(DOWNLOAD_IMAGE_MAX_WIDTH, 500).toInt();
-		int maxHeight = settings.value(DOWNLOAD_IMAGE_MAX_HEIGHT, 500).toInt();
+		QSize maxSize = m_settings.getImageMaxSize();
+		int maxWidth = maxSize.width();
+		int maxHeight = maxSize.height();
 
 		QImage img = QImage::fromData (fileContents);
 		if (img.width() > maxWidth) {
@@ -73,8 +72,7 @@ AttachedImageFile::AttachedImageFile (Backend& backend, const BackendFile& file,
 		QMenu menu (this);
 
 		menu.addAction("Save image", [this, &backend, &file] {
-			QSettings settings;
-			QDir downloadDir = settings.value(DOWNLOAD_LOCATION, QDir::currentPath()).toString();
+			QDir downloadDir = m_settings.getDownloadLocation();
 			QString saveFileDestination = QFileDialog::getSaveFileName (this, "Save image as... - Mattermost", downloadDir.filePath(file.name));
 
 			//the user has pressed the cancel button

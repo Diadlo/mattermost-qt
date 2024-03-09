@@ -32,9 +32,10 @@
 
 namespace Mattermost {
 
-AttachedBinaryFile::AttachedBinaryFile (Backend& backend, const BackendFile& file, QWidget *parent)
+AttachedBinaryFile::AttachedBinaryFile(Settings& settings, Backend& backend, const BackendFile& file, QWidget *parent)
 :QWidget(parent)
 ,ui(new Ui::AttachedBinaryFile)
+,m_settings(settings)
 {
 	ui->setupUi(this);
 	ui->fileNameLabel->setText ("File: " + file.name);
@@ -51,8 +52,7 @@ AttachedBinaryFile::AttachedBinaryFile (Backend& backend, const BackendFile& fil
 	 */
 	connect (ui->downloadButton, &QPushButton::clicked, [this, &backend, &file] {
 
-		QSettings settings;
-		QDir downloadDir = settings.value(DOWNLOAD_LOCATION, QDir::currentPath()).toString();
+		QDir downloadDir = m_settings.getDownloadLocation();
 		QString fileDestination (downloadDir.filePath(file.name));
 		QFileInfo fileInfo (fileDestination);
 

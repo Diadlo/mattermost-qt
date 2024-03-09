@@ -23,10 +23,10 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QDebug>
-#include <QSettings>
 #include <QComboBox>
 #include "backend/emoji/EmojiInfo.h"
 #include "ui_ChooseEmojiDialog.h"
+#include "Settings.h"
 
 namespace Mattermost {
 
@@ -50,9 +50,10 @@ static const uint32_t indexForCategoryTab[EmojiCategory::COUNT] = {
 	0,	//custom
 };
 
-ChooseEmojiDialog::ChooseEmojiDialog(QWidget *parent)
+ChooseEmojiDialog::ChooseEmojiDialog(Settings& settings, QWidget *parent)
 :QDialog(parent)
 ,ui(new Ui::ChooseEmojiDialog)
+,m_settings(settings)
 {
 	ui->setupUi(this);
 
@@ -94,8 +95,7 @@ QGridLayout* ChooseEmojiDialog::createTab (uint32_t categoryIdx, int tabIndex)
 
 void ChooseEmojiDialog::restoreEmojiFavorites ()
 {
-	QSettings settings;
-	QByteArray favoritesArray = settings.value("emoji_favorites").value<QByteArray>();
+	QByteArray favoritesArray = m_settings.getEmojiFavorites();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	QVector<EmojiID> favoriteEmojisVec ((EmojiID*)favoritesArray.begin(), (EmojiID*)favoritesArray.end());
@@ -144,11 +144,9 @@ void ChooseEmojiDialog::restoreEmojiFavorites ()
 
 void ChooseEmojiDialog::saveEmojiFavorites ()
 {
-	QSettings settings;
-
 	QVector<EmojiID> vec = favorites.keys().toVector();
 	QByteArray favoritesArray ((const char*)vec.data(), vec.size() * sizeof (vec[0]));
-	settings.setValue ("emoji_favorites", QVariant::fromValue(favoritesArray));
+	m_settings.setEmojiFavorites(favoritesArray);
 	qDebug() << "Save Emoji Favorites";
 }
 

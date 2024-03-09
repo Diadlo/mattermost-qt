@@ -20,7 +20,6 @@
 #include "SettingsWindow.h"
 
 #include <QFileDialog>
-#include <QSettings>
 #include <QIntValidator>
 #include <QStandardPaths>
 #include "ui_SettingsWindow.h"
@@ -28,24 +27,23 @@
 
 namespace Mattermost {
 
-SettingsWindow::SettingsWindow(QWidget *parent) :
+SettingsWindow::SettingsWindow(Settings& settings, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SettingsWindow)
+    ui(new Ui::SettingsWindow),
+	m_settings(settings)
 {
 	ui->setupUi(this);
-	ui->imageMaxWidthValue->setValidator(new QIntValidator (10, 1000, this));
-	ui->imageMaxHeightValue->setValidator(new QIntValidator (10, 1000, this));
+	QValidator *imageSizeValidator = new QIntValidator(Settings::MIN_IMAGE_SIZE, Settings::MAX_IMAGE_SIZE, this);
+	ui->imageMaxWidthValue->setValidator(imageSizeValidator);
+	ui->imageMaxHeightValue->setValidator(imageSizeValidator);
 
-	QString defaultDownloadDir (QStandardPaths::writableLocation (QStandardPaths::DownloadLocation));
-
-	QSettings settings;
-	ui->downloadLocationValue->setText (settings.value (DOWNLOAD_LOCATION, defaultDownloadDir).toString());
-	ui->askLocationCheckBox->setChecked (settings.value (DOWNLOAD_ASK, 0).toBool());
-	ui->imageMaxWidthValue->setText (settings.value (DOWNLOAD_IMAGE_MAX_WIDTH, 400).toString());
-	ui->imageMaxHeightValue->setText (settings.value (DOWNLOAD_IMAGE_MAX_HEIGHT, 400).toString());
+	ui->downloadLocationValue->setText(m_settings.getDownloadLocation());
+	ui->askLocationCheckBox->setChecked(m_settings.getDownloadAsk());
+	ui->imageMaxWidthValue->setText(QString::number(m_settings.getImageMaxWidth()));
+	ui->imageMaxHeightValue->setText(QString::number(m_settings.getImageMaxHeight()));
 
 	connect (ui->downloadLocationButton, &QPushButton::clicked, [this] {
-		QDir defaultDir (ui->downloadLocationValue->text());
+		QDir defaultDir(ui->downloadLocationValue->text());
 
 		if (!defaultDir.exists()) {
 			defaultDir = QDir::home();
@@ -61,12 +59,10 @@ SettingsWindow::~SettingsWindow()
 
 void SettingsWindow::applyNewSettings ()
 {
-	QSettings settings;
-	settings.setValue (DOWNLOAD_LOCATION, ui->downloadLocationValue->text());
-	settings.setValue (DOWNLOAD_ASK, ui->askLocationCheckBox->text());
-	settings.setValue (DOWNLOAD_IMAGE_MAX_WIDTH, ui->imageMaxWidthValue->text());
-	settings.setValue (DOWNLOAD_IMAGE_MAX_HEIGHT, ui->imageMaxHeightValue->text());
-	settings.sync ();
+	m_settings.setDownloadLocation(ui->downloadLocationValue->text());
+	m_settings.setDownloadAsk(ui->askLocationCheckBox->isChecked());
+	m_settings.setImageMaxWidth(ui->imageMaxWidthValue->text().toInt());
+	m_settings.setImageMaxHeight(ui->imageMaxHeightValue->text().toInt());
 }
 
 } /* namespace Mattermost */

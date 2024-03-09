@@ -30,19 +30,21 @@ namespace Mattermost {
 
 class Backend;
 class BackendFile;
+class Settings;
 
 class AttachedBinaryFile: public QWidget {
     Q_OBJECT
 
 public:
-    explicit AttachedBinaryFile (Backend& backend, const BackendFile& file, QWidget *parent = nullptr);
+    explicit AttachedBinaryFile(Settings& settings, Backend& backend, const BackendFile& file, QWidget *parent = nullptr);
     ~AttachedBinaryFile();
 private:
     void setFileMimeIcon (const QString& filename);
 private:
-    Ui::AttachedBinaryFile 	*ui;
-    QTemporaryFile			tempFile;
-    QString					downloadedPath;
+    Ui::AttachedBinaryFile* ui;
+    QTemporaryFile          tempFile;
+    QString                 downloadedPath;
+    Settings&               m_settings;
 };
 
 } /* namespace Mattermost */
