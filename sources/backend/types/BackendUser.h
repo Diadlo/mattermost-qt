@@ -4,7 +4,7 @@
  * @author Lyubomir Filipov
  * @date Nov 28, 2021
  *
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
  *
  * This file is part of Mattermost-QT.
  *
@@ -35,7 +35,7 @@ namespace Mattermost {
 /**
  * Holds settings that control the behavior of the Mattermost client
  * for a particular user. For example: display settings, visible channels and recent statuses
- */ 
+ */
 struct BackendUserPreferences {
 	QString category;
 	QString	name;

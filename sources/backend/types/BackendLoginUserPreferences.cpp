@@ -4,7 +4,7 @@
  * @author Lyubomir Filipov
  * @date Nov 28, 2021
  *
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
  *
  * This file is part of Mattermost-QT.
  *
@@ -48,7 +48,7 @@ namespace Mattermost {
 			const auto category = obj.value("category").toString();
 			const auto name = obj.value("name").toString();
 			const auto value = obj.value("value").toString();
-			
+
 			auto it = preference_loaders.find(category);
 			if (it != preference_loaders.end())
 			{

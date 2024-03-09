@@ -1,5 +1,6 @@
 /**
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
+ * Copyright 2024 Mattermost-QT developers
  *
  * This file is part of Mattermost-QT.
  *
@@ -166,7 +167,7 @@ More information:<br/>
 <a href='https://github.com/nuclear868/mattermost-qt'>https://github.com/nuclear868/mattermost-qt</a>
 <br/>
 <br/>
-Mattermost QT Copyright 2021, 2022 Lyubomir Filipov<br/>
+Mattermost QT Copyright 2021-2023 Lyubomir Filipov<br/>
 <br/>
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

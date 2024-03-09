@@ -4,7 +4,7 @@
  * @author Lyubomir Filipov
  * @date Dec 11, 2021
  *
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
  *
  * This file is part of Mattermost-QT.
  *

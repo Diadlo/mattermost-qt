@@ -5,7 +5,7 @@
  * @date Dec 8, 2022
  *
  * Copyright 2021-2022 Lyubomir Filipov
- * Copyright 2023-2024 Mattermost-QT developers
+ * Copyright 2024 Mattermost-QT developers
  *
  * This file is part of Mattermost-QT.
  *

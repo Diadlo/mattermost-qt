@@ -1,6 +1,6 @@
-/** 
- * Copyright 2021, 2022 Lyubomir Filipov
- * 
+/**
+ * Copyright 2021-2023 Lyubomir Filipov
+ *
  * This file is part of Mattermost-QT.
  *
  * Mattermost-QT is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Mattermost-QT; if not, see https://www.gnu.org/licenses/.
  */
- 
+
 #pragma once
 
 #define PROJECT_NAME "@PROJECT_NAME@"

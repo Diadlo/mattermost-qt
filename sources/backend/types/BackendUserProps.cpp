@@ -4,7 +4,7 @@
  * @author Lyubomir Filipov
  * @date Nov 28, 2021
  *
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
  *
  * This file is part of Mattermost-QT.
  *
@@ -53,16 +53,16 @@ BackendUserProps::BackendUserProps (const QJsonValue& json)
 	if (json == QJsonValue::Undefined) {
 		return;
 	}
-	
+
 	const QJsonObject& jsonObject = json.toObject();
-	
+
 	for (auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); ++it) {
 		if (it.key() == "customStatus") {
 			QString valueString = it.value().toString();
 			if (valueString.isEmpty()) {
 				continue;
 			}
-			
+
 			//status sting is a JSON document, represented inside string value
 			const QJsonObject statusObj = QJsonDocument::fromJson (valueString.toUtf8()).object();
 			customStatus.deserialize (statusObj);
@@ -71,8 +71,8 @@ BackendUserProps::BackendUserProps (const QJsonValue& json)
 			lastSearchPointer = it.value().toInt();
 		}
 	}
-	
-	
+
+
 	const QJsonValue statusJson = jsonObject.value("customStatus");
 	if (statusJson == QJsonValue::Undefined) {
 		return;

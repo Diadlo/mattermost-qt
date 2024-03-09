@@ -4,7 +4,7 @@
  * @author Lyubomir Filipov
  * @date Nov 28, 2021
  *
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
  *
  * This file is part of Mattermost-QT.
  *
@@ -34,9 +34,9 @@ class QJsonObject;
 namespace Mattermost {
 
 struct BackendUserCustomStatus {
-	
+
 	void deserialize (const QJsonObject& json);
-	
+
 	QString emoji;
 	QString text;
 	QString duration;
@@ -52,7 +52,7 @@ public:
 	virtual ~BackendUserProps ();
 public:
 	void updateFrom (const BackendUserProps& other, std::ostringstream& resultString);
-public:		
+public:
 	uint32_t					lastSearchPointer;
 	BackendUserCustomStatus		customStatus;
 };

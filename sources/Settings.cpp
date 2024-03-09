@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-2024 Mattermost-QT developers
+ * Copyright 2024 Mattermost-QT developers
  *
  * This file is part of Mattermost-QT.
  *

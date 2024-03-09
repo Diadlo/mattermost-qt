@@ -1,5 +1,6 @@
 /**
- * Copyright 2021, 2022 Lyubomir Filipov
+ * Copyright 2021-2023 Lyubomir Filipov
+ * Copyright 2024 Mattermost-QT developers
  *
  * This file is part of Mattermost-QT.
  *
