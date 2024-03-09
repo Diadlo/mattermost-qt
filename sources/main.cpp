@@ -93,6 +93,7 @@ void MattermostApplication::createMainWindow()
 	});
 	connect(mainWindow.get(), &MainWindow::loggedOut, [=] {
 		mainWindow = nullptr;
+		Settings::getInstance().clearUserCredentials();
 		openLoginWindow();
 		backend.logout([]{});
 	});

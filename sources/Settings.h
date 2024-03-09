@@ -58,6 +58,8 @@ public:
     QByteArray getWindowGeometry() const;
 
     // User settings
+    void clearUserCredentials();
+
     void setDomain(const QString& domain);
     QString getDomain() const;
 

@@ -84,6 +84,11 @@ QByteArray Settings::getWindowGeometry() const {
     return m_settings.value("geometry").toByteArray();
 }
 
+void Settings::clearUserCredentials() {
+    m_settings.remove("username");
+    m_settings.remove("token");
+}
+
 void Settings::setDomain(const QString& domain) {
     m_settings.setValue("domain", domain);
     m_settings.sync();
