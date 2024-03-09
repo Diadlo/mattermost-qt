@@ -28,16 +28,10 @@
 namespace Mattermost {
 
 Storage::Storage ()
-:loginUser (nullptr)
+:totalUsersCount (0)
+,loginUser (nullptr)
 ,matterpollUser (nullptr)
-,totalUsersCount (0)
 {
-}
-
-Storage::~Storage()
-{
-	delete loginUser;
-	delete matterpollUser;
 }
 
 void Storage::reset ()
