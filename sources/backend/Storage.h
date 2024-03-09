@@ -38,7 +38,7 @@ namespace Mattermost {
 class Storage {
 public:
 	Storage ();
-	virtual ~Storage ();
+	~Storage() = default;
 public:
 	void reset ();
 
@@ -85,10 +85,12 @@ public:
 	QMap<QString, BackendChannel*> 					channels;
 	QMap<QString, BackendChannel*> 					directChannelsByUser;
 	std::map<QString, BackendUser>					users;
-	BackendUser*									loginUser;
 	std::shared_ptr<BackendLoginUserPreferences>    loginUserPreferences;
-	BackendUser*									matterpollUser;
 	uint32_t										totalUsersCount;
+
+	// Users from `users` map. We don't need to delete them manually
+	BackendUser*  loginUser;
+	BackendUser*  matterpollUser;
 };
 
 } /* namespace Mattermost */
