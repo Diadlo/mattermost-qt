@@ -182,6 +182,30 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="imageThumbnailsTitle">
+        <property name="text">
+         <string>General</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+         <widget class="QCheckBox" name="closeToTray">
+          <property name="text">
+           <string>Close to tray</string>
+          </property>
+          <property name="toolTip">
+           <string>After pressing close the application will close to tray, instead of closing entirely.</string>
+          </property>
+         </widget>
+      </item>
      </layout>
     </widget>
    </item>

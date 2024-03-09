@@ -26,6 +26,7 @@
 #include "./ui_mainwindow.h"
 #include "chat-area/ChatArea.h"
 #include "backend/Backend.h"
+#include "Settings.h"
 #include "SettingsWindow.h"
 #include "build-config.h"
 #include "log.h"
@@ -36,7 +37,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 :QMainWindow(parent)
 ,ui (std::make_unique<Ui::MainWindow>())
 ,trayIcon (trayIcon)
-,chooseEmojiDialog (this)
+,chooseEmojiDialog(Settings::getInstance(), this)
 ,backend (_backend)
 ,currentTeamRestoredFromSettings (false)
 ,doDeinit (false)
@@ -147,8 +148,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	LOG_DEBUG ("MainWindow signal register finish");
 
 	//Restore saved window position and dimensions
-	QSettings settings;
-	restoreGeometry (settings.value( "geometry", saveGeometry()).toByteArray());
+	restoreGeometry(Settings::getInstance().getWindowGeometry());
 
 	connect (qApp, &QApplication::aboutToQuit, this, &MainWindow::saveState);
 	LOG_DEBUG ("MainWindow create finish");
@@ -192,7 +192,8 @@ void MainWindow::createMenu ()
 	});
 
 	mainMenu->addAction ("Settings", [this] {
-		settingsWindow = new SettingsWindow (this);
+		Settings& settings = Settings::getInstance();
+		settingsWindow = new SettingsWindow(settings, this);
 
 		connect (settingsWindow, &QDialog::accepted, [this] {
 
@@ -287,7 +288,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		return QMainWindow::closeEvent (event);
 	}
 
-	if (trayIcon.isVisible()) {
+	if (Settings::getInstance().getCloseToTray()) {
 		hide();
 		event->ignore();
 	}
@@ -364,8 +365,7 @@ void MainWindow::setNotificationsCountVisualization (uint32_t notificationsCount
 void MainWindow::saveState ()
 {
 	LOG_DEBUG ("MainWindow saveState");
-	QSettings settings;
-	settings.setValue ("geometry", saveGeometry());
+	Settings::getInstance().setWindowGeometry(saveGeometry());
 //	settings.setValue ("current_team", channelList.getCurrentTeamId());
 //	if (currentPage) {
 //		settings.setValue ("current_channel", currentPage->getChannel().id);

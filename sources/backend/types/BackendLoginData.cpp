@@ -23,21 +23,22 @@
  */
 
 #include "BackendLoginData.h"
+#include "Settings.h"
 
 namespace Mattermost {
 
-void BackendLoginData::loadFromSettings (const QSettings& settings)
+void BackendLoginData::loadFromSettings(const Settings& settings)
 {
-	domain = settings.value("domain").toString();
-	username = settings.value("username").toString();
-	token = settings.value("token").toString();
+	domain = settings.getDomain();
+	username = settings.getUsername();
+	token = settings.getToken();
 }
 
-void BackendLoginData::saveToSettings (QSettings& settings) const
+void BackendLoginData::saveToSettings(Settings& settings) const
 {
-	settings.setValue("domain", domain);
-	settings.setValue("username", username);
-	settings.setValue("token", token);
+	settings.setDomain(domain);
+	settings.setUsername(username);
+	settings.setToken(token);
 }
 
 bool BackendLoginData::areAllFieldsFilled () const

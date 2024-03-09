@@ -33,9 +33,11 @@ class ChooseEmojiDialog;
 
 namespace Mattermost {
 
+class Settings;
+
 class ChooseEmojiDialog: public QDialog {
 private:
-    explicit ChooseEmojiDialog (QWidget *parent = nullptr);
+    explicit ChooseEmojiDialog(Settings& settings, QWidget *parent = nullptr);
     ~ChooseEmojiDialog();
 public:
     void show ();
@@ -50,11 +52,12 @@ private:
     void updateFavoritesTab ();
 private:
     friend class ChooseEmojiDialogWrapper;
-    Ui::ChooseEmojiDialog*	ui;
-    QComboBox*				skinToneComboBox;
-    QVector<QPushButton*>	peopleEmojiButtons;
-    Emoji					selectedEmoji;
-    QMap<EmojiID, Emoji>	favorites;
+    Ui::ChooseEmojiDialog*  ui;
+    QComboBox*              skinToneComboBox;
+    QVector<QPushButton*>   peopleEmojiButtons;
+    Emoji                   selectedEmoji;
+    QMap<EmojiID, Emoji>    favorites;
+    Settings&               m_settings;
 };
 
 } /* namespace Mattermost */

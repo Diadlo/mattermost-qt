@@ -35,7 +35,6 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
-#include <QSettings>
 #include <QStandardPaths>
 #include <QDebug>
 #include <QList>

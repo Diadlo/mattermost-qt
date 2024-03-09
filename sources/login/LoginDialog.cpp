@@ -20,13 +20,13 @@
 #include <QtGui/qcolor.h>
 #include <iostream>
 #include "LoginDialog.h"
+#include "Settings.h"
 #include "ui_LoginDialog.h"
 
 #include <QWebEngineView>
 #include <QWebEngineCookieStore>
 #include <QWebEngineProfile>
 #include <QNetworkCookie>
-#include <QSettings>
 #include "backend/Backend.h"
 #include "log.h"
 
@@ -38,9 +38,8 @@ LoginDialog::LoginDialog (QWidget *parent, Backend& backend)
 ,ui(new Ui::LoginDialog)
 {
 	setAttribute (Qt::WA_DeleteOnClose);
-	QSettings settings;
 	BackendLoginData loginData;
-	loginData.loadFromSettings (settings);
+	loginData.loadFromSettings(Settings::getInstance());
 
 	ui->setupUi(this);
 
@@ -71,7 +70,6 @@ LoginDialog::~LoginDialog()
 
 void LoginDialog::on_login_pushButton_clicked()
 {
-	QSettings settings;
 	BackendLoginData loginData;
 
 	loginData.domain = ui->domain_lineEdit->text();
@@ -79,7 +77,7 @@ void LoginDialog::on_login_pushButton_clicked()
 	loginData.password = ui->password_lineEdit->text();
 	loginData.token = "";
 
-	loginData.saveToSettings (settings);
+	loginData.saveToSettings(Settings::getInstance());
 	loginToServer (loginData);
 }
 
@@ -111,11 +109,10 @@ void LoginDialog::on_browserLogin_pushButton_clicked()
 
 void LoginDialog::processTokenAuth(const QString& token)
 {
-  QSettings settings;
   BackendLoginData loginData;
   loginData.domain = ui->domain_lineEdit->text();
   loginData.token = token;
-  loginData.saveToSettings (settings);
+  loginData.saveToSettings(Settings::getInstance());
   loginToServer (loginData);
 }
 
@@ -143,8 +140,7 @@ void LoginDialog::loginToServer (const BackendLoginData& loginData)
 		}
 
 		loginData.token = token;
-		QSettings settings;
-		loginData.saveToSettings (settings);
+		loginData.saveToSettings(Settings::getInstance());
 		accept();
 	});
 }

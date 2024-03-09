@@ -30,9 +30,11 @@ class QWidget;
 
 namespace Mattermost {
 
+class Settings;
+
 class ChooseEmojiDialogWrapper {
 public:
-	ChooseEmojiDialogWrapper (QWidget* parent);
+	ChooseEmojiDialogWrapper(Settings& settings, QWidget* parent);
 	virtual ~ChooseEmojiDialogWrapper ();
 public:
 	ChooseEmojiDialog 	dialog;
