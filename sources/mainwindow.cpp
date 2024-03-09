@@ -35,6 +35,7 @@
 #include <QGridLayout>
 #include <QStackedWidget>
 #include <QToolButton>
+#include <QSplitter>
 #include "channel-tree/ChannelTree.h"
 #include "chat-area/ChatArea.h"
 #include "backend/Backend.h"
@@ -64,7 +65,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	const BackendUser& currentUser = backend.getLoginUser();
 
 	if (currentUser.id.isEmpty()) {
-		m_usericon_label->clear();
+		m_userIcon_label->clear();
 		qCritical() << "Current User's ID is empty string";
 		return;
 	}
@@ -78,7 +79,7 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	connect (&currentUser, &BackendUser::onAvatarChanged, [this, &currentUser] {
 		LOG_DEBUG ("Got User Image");
 		QImage img = QImage::fromData (currentUser.avatar).scaled(42, 42, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		m_usericon_label->setPixmap (QPixmap::fromImage(img));
+		m_userIcon_label->setPixmap (QPixmap::fromImage(img));
 	});
 
 	/*
@@ -165,88 +166,82 @@ MainWindow::MainWindow (QWidget *parent, QSystemTrayIcon& trayIcon, Backend& _ba
 	LOG_DEBUG ("MainWindow create finish");
 }
 
+void MainWindow::setupTopLeftWidget()
+{
+	m_topLeft_frame = new QFrame();
+	m_topLeft_frame->setFrameShape(QFrame::NoFrame);
+	m_topLeft_frame->setFrameShadow(QFrame::Raised);
+	m_topLeft_frame->setLineWidth(0);
+
+	m_tlHorizontalLayout = new QHBoxLayout(m_topLeft_frame);
+	m_tlHorizontalLayout->setSpacing(2);
+	m_tlHorizontalLayout->setContentsMargins(2, 0, 0, 0);
+
+	m_userIcon_label = new QLabel(m_topLeft_frame);
+	QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(m_userIcon_label->sizePolicy().hasHeightForWidth());
+	m_userIcon_label->setSizePolicy(sizePolicy);
+	m_userIcon_label->setMinimumSize(QSize(42, 42));
+	m_userIcon_label->setMaximumSize(QSize(42, 42));
+	m_userIcon_label->setFrameShape(QFrame::Box);
+
+	m_tlHorizontalLayout->addWidget(m_userIcon_label);
+
+	m_tlVerticalLayout = new QVBoxLayout();
+	m_usernameLabel = new QLabel(m_topLeft_frame);
+
+	m_tlVerticalLayout->addWidget(m_usernameLabel);
+
+	m_statusLabel = new QLabel(m_topLeft_frame);
+
+	m_tlVerticalLayout->addWidget(m_statusLabel);
+	m_tlHorizontalLayout->addLayout(m_tlVerticalLayout);
+
+	m_toolButton = new QToolButton(m_topLeft_frame);
+	m_toolButton->setObjectName("toolButton");
+	m_toolButton->setIcon(QIcon(":/icons/burger"));
+	m_toolButton->setPopupMode(QToolButton::InstantPopup);
+
+	m_tlHorizontalLayout->addWidget(m_toolButton);
+}
+
 void MainWindow::setupUi()
 {
 	resize(800, 600);
 	setWindowIcon(QIcon(":/icons/img/icon0.ico"));
 
 	m_actionAbout = new QAction(this);
-	m_centralwidget = new QWidget(this);
-	m_gridLayout_2 = new QGridLayout(m_centralwidget);
-	m_gridLayout_2->setSpacing(0);
+	m_splitter = new QSplitter(this);
+	QWidget *leftPaneWidget = new QWidget(m_splitter);
+	leftPaneWidget->setMinimumWidth(200);
+	leftPaneWidget->setMaximumWidth(300);
+	QVBoxLayout *leftPaneLayout = new QVBoxLayout(leftPaneWidget);
+	m_splitter->addWidget(leftPaneWidget);
+	m_splitter->setCollapsible(0, false);
+	setupTopLeftWidget();
+	leftPaneLayout->addWidget(m_topLeft_frame);
 
-	m_lefttop_frame = new QFrame(m_centralwidget);
-	m_lefttop_frame->setMinimumSize(QSize(223, 50));
-	m_lefttop_frame->setMaximumSize(QSize(16777215, 50));
-	m_lefttop_frame->setBaseSize(QSize(223, 63));
-	m_lefttop_frame->setFrameShape(QFrame::NoFrame);
-	m_lefttop_frame->setFrameShadow(QFrame::Raised);
-	m_lefttop_frame->setLineWidth(0);
-
-	m_horizontalLayout = new QHBoxLayout(m_lefttop_frame);
-	m_horizontalLayout->setSpacing(2);
-	m_horizontalLayout->setContentsMargins(2, 0, 0, 0);
-
-	m_usericon_label = new QLabel(m_lefttop_frame);
-	QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-	sizePolicy.setHorizontalStretch(0);
-	sizePolicy.setVerticalStretch(0);
-	sizePolicy.setHeightForWidth(m_usericon_label->sizePolicy().hasHeightForWidth());
-	m_usericon_label->setSizePolicy(sizePolicy);
-	m_usericon_label->setMinimumSize(QSize(42, 42));
-	m_usericon_label->setMaximumSize(QSize(42, 42));
-	m_usericon_label->setFrameShape(QFrame::Box);
-
-	m_horizontalLayout->addWidget(m_usericon_label);
-
-	m_verticalLayout = new QVBoxLayout();
-	m_usernameLabel = new QLabel(m_lefttop_frame);
-	m_usernameLabel->setMinimumSize(QSize(200, 20));
-
-	m_verticalLayout->addWidget(m_usernameLabel);
-
-	m_statusLabel = new QLabel(m_lefttop_frame);
-	m_statusLabel->setObjectName("statusLabel");
-
-	m_verticalLayout->addWidget(m_statusLabel);
-
-	m_horizontalLayout->addLayout(m_verticalLayout);
-
-	m_toolButton = new QToolButton(m_lefttop_frame);
-	m_toolButton->setObjectName("toolButton");
-	m_toolButton->setIcon(QIcon(":/icons/burger"));
-	m_toolButton->setPopupMode(QToolButton::InstantPopup);
-
-	m_horizontalLayout->addWidget(m_toolButton);
-
-	m_gridLayout_2->addWidget(m_lefttop_frame, 0, 0, 1, 1);
-
-	m_channelList = new Mattermost::ChannelTree(m_centralwidget);
+	m_channelList = new Mattermost::ChannelTree();
 	QTreeWidgetItem *treeItem = new QTreeWidgetItem();
 	treeItem->setText(1, QString::fromUtf8("2"));
 	treeItem->setText(0, QString::fromUtf8("1"));
 	m_channelList->setHeaderItem(treeItem);
-
-	QSizePolicy sizePolicy1(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-	sizePolicy1.setHorizontalStretch(0);
-	sizePolicy1.setVerticalStretch(0);
-	sizePolicy1.setHeightForWidth(m_channelList->sizePolicy().hasHeightForWidth());
-	m_channelList->setSizePolicy(sizePolicy1);
-	m_channelList->setMaximumSize(QSize(500, 16777215));
 	m_channelList->setContextMenuPolicy(Qt::CustomContextMenu);
-	m_channelList->setStyleSheet(QString::fromUtf8(
-"QTreeWidget::branch:!has-children {\n"
-"	border: none;\n"
-"}\n"
-"\n"
-"QTreeWidget::branch:open:has-children {\n"
-"	image: url(:/img/arrow_expanded.png)\n"
-"}\n"
-"\n"
-"QTreeWidget::branch:closed:has-children {\n"
-"	image: url(:/img/arrow_collapsed.png)\n"
-"}\n"
-""));
+	m_channelList->setStyleSheet(
+		"QTreeWidget::branch:!has-children {\n"
+		"	border: none;\n"
+		"}\n"
+		"\n"
+		"QTreeWidget::branch:open:has-children {\n"
+		"	image: url(:/img/arrow_expanded.png)\n"
+		"}\n"
+		"\n"
+		"QTreeWidget::branch:closed:has-children {\n"
+		"	image: url(:/img/arrow_collapsed.png)\n"
+		"}\n"
+	);
 	m_channelList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_channelList->setIconSize(QSize(20, 20));
 	m_channelList->setIndentation(12);
@@ -256,13 +251,13 @@ void MainWindow::setupUi()
 	m_channelList->header()->setDefaultSectionSize(30);
 	m_channelList->header()->setStretchLastSection(false);
 
-	m_gridLayout_2->addWidget(m_channelList, 1, 0, 1, 1);
+	leftPaneLayout->addWidget(m_channelList);
 
-	m_chatAreaStackedWidget = new QStackedWidget(m_centralwidget);
+	m_chatAreaStackedWidget = new QStackedWidget(m_splitter);
 
-	m_gridLayout_2->addWidget(m_chatAreaStackedWidget, 0, 1, 2, 1);
+	m_splitter->addWidget(m_chatAreaStackedWidget);
 
-	setCentralWidget(m_centralwidget);
+	setCentralWidget(m_splitter);
 	m_menubar = new QMenuBar(this);
 	m_menubar->setGeometry(QRect(0, 0, 800, 32));
 	setMenuBar(m_menubar);

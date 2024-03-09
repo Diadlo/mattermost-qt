@@ -36,6 +36,7 @@ class QLabel;
 class QSystemTrayIcon;
 class QTreeWidgetItem;
 class QStackedWidget;
+class QSplitter;
 
 namespace Mattermost {
 
@@ -90,6 +91,7 @@ private:
 	void reload ();
 
 	void setupUi();
+	void setupTopLeftWidget();
 	void retranslateUi();
 
 private:
@@ -102,16 +104,18 @@ private:
 	SettingsWindow*						settingsWindow;
 	bool								doDeinit;
 
+	QSplitter *m_splitter;
     QAction *m_actionAbout;
-    QWidget *m_centralwidget;
     QGridLayout *m_gridLayout_2;
-    QFrame *m_lefttop_frame;
-    QHBoxLayout *m_horizontalLayout;
-    QLabel *m_usericon_label;
-    QVBoxLayout *m_verticalLayout;
+    QLabel *m_userIcon_label;
     QLabel *m_usernameLabel;
     QLabel *m_statusLabel;
     QToolButton *m_toolButton;
+
+	// tl = top left
+    QFrame *m_topLeft_frame;
+    QHBoxLayout *m_tlHorizontalLayout;
+    QVBoxLayout *m_tlVerticalLayout;
 
     Mattermost::ChannelTree *m_channelList;
     QStackedWidget *m_chatAreaStackedWidget;
