@@ -129,9 +129,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="styleSheet">
-            <string notr="true">padding-left:1px; padding-bottom: 3px</string>
-           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
@@ -194,9 +191,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">padding-left:1px; padding-bottom: 3px</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
